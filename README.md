@@ -41,7 +41,7 @@ $ ruby symglucose_csv_to_01.rb [bg|dbg] FILE
 
 ### Example
 
-```
+```sh
 $ ruby main.rb bg results/2021-07-28_13-57-35/adult\#001.csv
 $ ruby main.rb dbg results/2021-07-28_13-57-35/adult\#001.csv
 
