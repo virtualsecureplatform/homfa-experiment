@@ -58,19 +58,37 @@ check_false(){
 check_false  dfa-plain 5 damon-001.spec adult-001-bg.in
 check_true   dfa-plain 5 damon-001.spec adult-001-bg-true.in
 check_false  dfa-plain 5 damon-002.spec adult-001-dbg.in
-check_true  dfa-plain 5 damon-002.spec adult-001-dbg-true.in
+check_true   dfa-plain 5 damon-002.spec adult-001-dbg-true.in
+check_true   dfa-plain 5 damon-004.spec test-damon-004-true.in
+check_false  dfa-plain 5 damon-004.spec test-damon-004-false.in
+check_false  dfa-plain 5 damon-004.spec adult-001-bg.in
+check_true   dfa-plain 5 damon-005.spec test-damon-005-true.in
+check_false  dfa-plain 5 damon-005.spec test-damon-005-false.in
+check_true   dfa-plain 5 damon-005.spec adult-001-bg.in
 
 #### Offline DFA
 check_false  offline-dfa 5 damon-001.spec adult-001-bg.in
 check_true   offline-dfa-plain 5 damon-001.spec adult-001-bg-true.in
 check_false  offline-dfa-plain 5 damon-002.spec adult-001-dbg.in
-check_true  offline-dfa-plain 5 damon-002.spec adult-001-dbg-true.in
+check_true   offline-dfa-plain 5 damon-002.spec adult-001-dbg-true.in
+check_true   offline-dfa-plain 5 damon-004.spec test-damon-004-true.in
+check_false  offline-dfa-plain 5 damon-004.spec test-damon-004-false.in
+check_false  offline-dfa-plain 5 damon-004.spec adult-001-bg.in
+check_true   offline-dfa-plain 5 damon-005.spec test-damon-005-true.in
+check_false  offline-dfa-plain 5 damon-005.spec test-damon-005-false.in
+check_true   offline-dfa-plain 5 damon-005.spec adult-001-bg.in
 
 #### Online DFA (reversed)
 check_false online-dfa-reversed 5 damon-001.spec adult-001-bg.in
 check_true  online-dfa-reversed 5 damon-001.spec adult-001-bg-true.in
 check_false online-dfa-reversed 5 damon-002.spec adult-001-dbg.in
-check_true online-dfa-reversed 5 damon-002.spec adult-001-dbg-true.in
+check_true  online-dfa-reversed 5 damon-002.spec adult-001-dbg-true.in
+check_true  online-dfa-reversed 5 damon-004.spec test-damon-004-true.in
+check_false online-dfa-reversed 5 damon-004.spec test-damon-004-false.in
+check_false online-dfa-reversed 5 damon-004.spec adult-001-bg.in
+check_true  online-dfa-reversed 5 damon-005.spec test-damon-005-true.in
+check_false online-dfa-reversed 5 damon-005.spec test-damon-005-false.in
+check_true  online-dfa-reversed 5 damon-005.spec adult-001-bg.in
 
 ### Clean up temporary files
 rm _test_sk _test_bk _test_in _test_out #_test_random.log
