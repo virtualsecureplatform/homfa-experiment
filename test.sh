@@ -28,8 +28,8 @@ enc_run_dec(){
             $HOMFA run-online-dfa --method qtrlwe2 --bkey _test_bk --spec "$3" --in _test_in --out _test_out
             $HOMFA dec --key _test_sk --in _test_out
             ;;
-        "dfa-plain" )
-            $HOMFA run-dfa-plain --ap "$2" --spec "$3" --in "$4"
+    	"dfa-plain" )
+	    $HOMFA run-dfa-plain --ap "$2" --spec "$3" --in "$4"
             ;;
         * )
             failwith "Invalid run $1"
@@ -66,6 +66,21 @@ check_true   dfa-plain 5 damon-005.spec test-damon-005-true.in
 check_false  dfa-plain 5 damon-005.spec test-damon-005-false.in
 check_true   dfa-plain 5 damon-005.spec adult-001-bg.in
 
+check_true   dfa-plain 5 towards-001.spec test-towards-001-true.in
+check_false  dfa-plain 5 towards-001.spec test-towards-001-false.in
+check_false  dfa-plain 5 towards-001.spec adult-001-dt-30-bg.in
+check_true   dfa-plain 5 towards-002.spec test-towards-002-true.in
+check_true   dfa-plain 5 towards-002.spec adult-001-dt-30-bg.in
+check_true   dfa-plain 5 towards-004.spec test-towards-004-true.in
+check_false  dfa-plain 5 towards-004.spec test-towards-004-false.in
+check_true   dfa-plain 5 towards-004.spec adult-001-dt-30-bg.in
+check_true   dfa-plain 5 towards-005.spec test-towards-005-true.in
+check_false  dfa-plain 5 towards-005.spec test-towards-005-false.in
+check_true   dfa-plain 5 towards-005.spec adult-001-dt-30-bg.in
+check_true   dfa-plain 5 towards-006.spec test-towards-006-true.in
+check_false  dfa-plain 5 towards-006.spec test-towards-006-false.in
+check_true   dfa-plain 5 towards-006.spec adult-001-dt-30-bg.in
+
 #### Offline DFA
 check_false  offline-dfa 5 damon-001.spec adult-001-bg.in
 check_true   offline-dfa 5 damon-001.spec adult-001-bg-true.in
@@ -78,6 +93,21 @@ check_true   offline-dfa 5 damon-005.spec test-damon-005-true.in
 check_false  offline-dfa 5 damon-005.spec test-damon-005-false.in
 check_true   offline-dfa 5 damon-005.spec adult-001-bg.in
 
+check_true   offline-dfa 5 towards-001.spec test-towards-001-true.in
+check_false  offline-dfa 5 towards-001.spec test-towards-001-false.in
+check_false  offline-dfa 5 towards-001.spec adult-001-dt-30-bg.in
+check_true   offline-dfa 5 towards-002.spec test-towards-002-true.in
+check_true   offline-dfa 5 towards-002.spec adult-001-dt-30-bg.in
+check_true   offline-dfa 5 towards-004.spec test-towards-004-true.in
+check_false  offline-dfa 5 towards-004.spec test-towards-004-false.in
+check_true   offline-dfa 5 towards-004.spec adult-001-dt-30-bg.in
+check_true   offline-dfa 5 towards-005.spec test-towards-005-true.in
+check_false  offline-dfa 5 towards-005.spec test-towards-005-false.in
+check_true   offline-dfa 5 towards-005.spec adult-001-dt-30-bg.in
+check_true   offline-dfa 5 towards-006.spec test-towards-006-true.in
+check_false  offline-dfa 5 towards-006.spec test-towards-006-false.in
+check_true   offline-dfa 5 towards-006.spec adult-001-dt-30-bg.in
+
 #### Online DFA (reversed)
 check_false online-dfa-reversed 5 damon-001.spec adult-001-bg.in
 check_true  online-dfa-reversed 5 damon-001.spec adult-001-bg-true.in
@@ -89,6 +119,48 @@ check_false online-dfa-reversed 5 damon-004.spec adult-001-bg.in
 check_true  online-dfa-reversed 5 damon-005.spec test-damon-005-true.in
 check_false online-dfa-reversed 5 damon-005.spec test-damon-005-false.in
 check_true  online-dfa-reversed 5 damon-005.spec adult-001-bg.in
+
+check_true  online-dfa-reversed 5 towards-001.spec test-towards-001-true.in
+check_false online-dfa-reversed 5 towards-001.spec test-towards-001-false.in
+check_false online-dfa-reversed 5 towards-001.spec adult-001-dt-30-bg.in
+check_true  online-dfa-reversed 5 towards-002.spec test-towards-002-true.in
+check_true  online-dfa-reversed 5 towards-002.spec adult-001-dt-30-bg.in
+check_true  online-dfa-reversed 5 towards-004.spec test-towards-004-true.in
+check_false online-dfa-reversed 5 towards-004.spec test-towards-004-false.in
+check_true  online-dfa-reversed 5 towards-004.spec adult-001-dt-30-bg.in
+check_true  online-dfa-reversed 5 towards-005.spec test-towards-005-true.in
+check_false online-dfa-reversed 5 towards-005.spec test-towards-005-false.in
+check_true  online-dfa-reversed 5 towards-005.spec adult-001-dt-30-bg.in
+check_true  online-dfa-reversed 5 towards-006.spec test-towards-006-true.in
+check_false online-dfa-reversed 5 towards-006.spec test-towards-006-false.in
+check_true  online-dfa-reversed 5 towards-006.spec adult-001-dt-30-bg.in
+
+#### Online DFA (qtrlwe2)
+check_false online-dfa-qtrlwe2 5 damon-001.spec adult-001-bg.in
+check_true  online-dfa-qtrlwe2 5 damon-001.spec adult-001-bg-true.in
+check_false online-dfa-qtrlwe2 5 damon-002.spec adult-001-dbg.in
+check_true  online-dfa-qtrlwe2 5 damon-002.spec adult-001-dbg-true.in
+check_true  online-dfa-qtrlwe2 5 damon-004.spec test-damon-004-true.in
+check_false online-dfa-qtrlwe2 5 damon-004.spec test-damon-004-false.in
+check_false online-dfa-qtrlwe2 5 damon-004.spec adult-001-bg.in
+check_true  online-dfa-qtrlwe2 5 damon-005.spec test-damon-005-true.in
+check_false online-dfa-qtrlwe2 5 damon-005.spec test-damon-005-false.in
+check_true  online-dfa-qtrlwe2 5 damon-005.spec adult-001-bg.in
+
+check_true  online-dfa-qtrlwe2 5 towards-001.spec test-towards-001-true.in
+check_false online-dfa-qtrlwe2 5 towards-001.spec test-towards-001-false.in
+check_false online-dfa-qtrlwe2 5 towards-001.spec adult-001-dt-30-bg.in
+check_true  online-dfa-qtrlwe2 5 towards-002.spec test-towards-002-true.in
+check_true  online-dfa-qtrlwe2 5 towards-002.spec adult-001-dt-30-bg.in
+check_true  online-dfa-qtrlwe2 5 towards-004.spec test-towards-004-true.in
+check_false online-dfa-qtrlwe2 5 towards-004.spec test-towards-004-false.in
+check_true  online-dfa-qtrlwe2 5 towards-004.spec adult-001-dt-30-bg.in
+check_true  online-dfa-qtrlwe2 5 towards-005.spec test-towards-005-true.in
+check_false online-dfa-qtrlwe2 5 towards-005.spec test-towards-005-false.in
+check_true  online-dfa-qtrlwe2 5 towards-005.spec adult-001-dt-30-bg.in
+check_true  online-dfa-qtrlwe2 5 towards-006.spec test-towards-006-true.in
+check_false online-dfa-qtrlwe2 5 towards-006.spec test-towards-006-false.in
+check_true  online-dfa-qtrlwe2 5 towards-006.spec adult-001-dt-30-bg.in
 
 ### Clean up temporary files
 rm _test_sk _test_bk _test_in _test_out #_test_random.log
