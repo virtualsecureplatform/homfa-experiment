@@ -37,10 +37,10 @@ run_benchmark offline  damon-001.spec adult-001-7days-bg.in
 run_benchmark reversed damon-001-rev.spec adult-001-7days-bg.in
 run_benchmark qtrlwe2  damon-001.spec adult-001-7days-bg.in
 
-run_benchmark plain    damon-002.spec adult-001-dbg.in
-run_benchmark offline  damon-002.spec adult-001-dbg.in
-run_benchmark reversed damon-002.spec adult-001-dbg.in
-run_benchmark qtrlwe2  damon-002.spec adult-001-dbg.in
+run_benchmark plain    damon-002.spec adult-001-7days-dbg.in
+run_benchmark offline  damon-002.spec adult-001-7days-dbg.in
+run_benchmark reversed damon-002.spec adult-001-7days-dbg.in
+run_benchmark qtrlwe2  damon-002.spec adult-001-7days-dbg.in
 
 run_benchmark plain    damon-004.spec adult-001-7days-bg.in
 run_benchmark offline  damon-004.spec adult-001-7days-bg.in
