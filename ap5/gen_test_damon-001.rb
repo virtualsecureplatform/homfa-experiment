@@ -24,30 +24,22 @@ raise "Usage: #{$0} [true|false] COL_NUM" unless ARGV.size == 2
 subcommand = ARGV[0]
 num = ARGV[1].to_i
 
-threshold = 200
+srand(0)
 
 idx = 0
-
 case subcommand
 when "true" then
   while idx < num
-    for cnt in 0..22 do
-      v = hist(220.0, min: 0, max: 31, step: 10)
-      print_bits(v, 5)
-      idx = idx + 1
-    end
-    v = hist(180.0, min: 0, max: 31, step: 10)
+    v = hist(rand(70.0...180.0), min: 0, max: 31, step: 10)
     print_bits(v, 5)
     idx = idx + 1
   end
 when "false" then
+  v = hist(30.0, min: 0, max: 31, step: 10)
+  print_bits(v, 5)
+  idx = idx + 1
   while idx < num
-    for cnt in 0..30 do
-      v = hist(220.0, min: 0, max: 31, step: 10)
-      print_bits(v, 5)
-      idx = idx + 1
-    end
-    v = hist(180.0, min: 0, max: 31, step: 10)
+    v = hist(rand(70.0...180.0), min: 0, max: 31, step: 10)
     print_bits(v, 5)
     idx = idx + 1
   end

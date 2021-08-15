@@ -55,16 +55,18 @@ check_false(){
 
 ### Now start testing
 #### Plain DFA
-check_false  dfa-plain 5 damon-001.spec adult-001-bg.in
-check_true   dfa-plain 5 damon-001.spec adult-001-bg-true.in
-check_false  dfa-plain 5 damon-002.spec adult-001-dbg.in
-check_true   dfa-plain 5 damon-002.spec adult-001-dbg-true.in
+check_false  dfa-plain 5 damon-001.spec test-damon-001-false.in
+check_true   dfa-plain 5 damon-001.spec test-damon-001-true.in
+check_false  dfa-plain 5 damon-001.spec adult-001-7days-bg.in
+check_false  dfa-plain 5 damon-002.spec test-damon-002-false.in
+check_true   dfa-plain 5 damon-002.spec test-damon-002-true.in
+check_false  dfa-plain 5 damon-002.spec adult-001-7days-dbg.in
 check_true   dfa-plain 5 damon-004.spec test-damon-004-true.in
 check_false  dfa-plain 5 damon-004.spec test-damon-004-false.in
-check_false  dfa-plain 5 damon-004.spec adult-001-bg.in
+check_true   dfa-plain 5 damon-004.spec adult-001-7days-bg.in
 check_true   dfa-plain 5 damon-005.spec test-damon-005-true.in
 check_false  dfa-plain 5 damon-005.spec test-damon-005-false.in
-check_true   dfa-plain 5 damon-005.spec adult-001-bg.in
+check_true   dfa-plain 5 damon-005.spec adult-001-7days-bg.in
 
 check_true   dfa-plain 5 towards-001.spec test-towards-001-true.in
 check_false  dfa-plain 5 towards-001.spec test-towards-001-false.in
@@ -82,16 +84,18 @@ check_false  dfa-plain 5 towards-006.spec test-towards-006-false.in
 check_true   dfa-plain 5 towards-006.spec adult-001-dt-30-bg.in
 
 #### Offline DFA
-check_false  offline-dfa 5 damon-001.spec adult-001-bg.in
-check_true   offline-dfa 5 damon-001.spec adult-001-bg-true.in
-check_false  offline-dfa 5 damon-002.spec adult-001-dbg.in
-check_true   offline-dfa 5 damon-002.spec adult-001-dbg-true.in
+check_false  offline-dfa 5 damon-001.spec test-damon-001-false.in
+check_true   offline-dfa 5 damon-001.spec test-damon-001-true.in
+check_false  offline-dfa 5 damon-001.spec adult-001-7days-bg.in
+check_false  offline-dfa 5 damon-002.spec test-damon-002-false.in
+check_true   offline-dfa 5 damon-002.spec test-damon-002-true.in
+check_false  offline-dfa 5 damon-002.spec adult-001-7days-dbg.in
 check_true   offline-dfa 5 damon-004.spec test-damon-004-true.in
 check_false  offline-dfa 5 damon-004.spec test-damon-004-false.in
-check_false  offline-dfa 5 damon-004.spec adult-001-bg.in
+check_true   offline-dfa 5 damon-004.spec adult-001-7days-bg.in
 check_true   offline-dfa 5 damon-005.spec test-damon-005-true.in
 check_false  offline-dfa 5 damon-005.spec test-damon-005-false.in
-check_true   offline-dfa 5 damon-005.spec adult-001-bg.in
+check_true   offline-dfa 5 damon-005.spec adult-001-7days-bg.in
 
 check_true   offline-dfa 5 towards-001.spec test-towards-001-true.in
 check_false  offline-dfa 5 towards-001.spec test-towards-001-false.in
@@ -109,16 +113,18 @@ check_false  offline-dfa 5 towards-006.spec test-towards-006-false.in
 check_true   offline-dfa 5 towards-006.spec adult-001-dt-30-bg.in
 
 #### Online DFA (reversed)
-check_false online-dfa-reversed 5 damon-001.spec adult-001-bg.in
-check_true  online-dfa-reversed 5 damon-001.spec adult-001-bg-true.in
-check_false online-dfa-reversed 5 damon-002.spec adult-001-dbg.in
-check_true  online-dfa-reversed 5 damon-002.spec adult-001-dbg-true.in
-check_true  online-dfa-reversed 5 damon-004.spec test-damon-004-true.in
-check_false online-dfa-reversed 5 damon-004.spec test-damon-004-false.in
-check_false online-dfa-reversed 5 damon-004.spec adult-001-bg.in
-check_true  online-dfa-reversed 5 damon-005.spec test-damon-005-true.in
-check_false online-dfa-reversed 5 damon-005.spec test-damon-005-false.in
-check_true  online-dfa-reversed 5 damon-005.spec adult-001-bg.in
+check_false  online-dfa-reversed 5 damon-001.spec test-damon-001-false.in
+check_true   online-dfa-reversed 5 damon-001.spec test-damon-001-true.in
+check_false  online-dfa-reversed 5 damon-001.spec adult-001-7days-bg.in
+check_false  online-dfa-reversed 5 damon-002.spec test-damon-002-false.in
+check_true   online-dfa-reversed 5 damon-002.spec test-damon-002-true.in
+check_false  online-dfa-reversed 5 damon-002.spec adult-001-7days-dbg.in
+check_true   online-dfa-reversed 5 damon-004.spec test-damon-004-true.in
+check_false  online-dfa-reversed 5 damon-004.spec test-damon-004-false.in
+check_true   online-dfa-reversed 5 damon-004.spec adult-001-7days-bg.in
+check_true   online-dfa-reversed 5 damon-005.spec test-damon-005-true.in
+check_false  online-dfa-reversed 5 damon-005.spec test-damon-005-false.in
+check_true   online-dfa-reversed 5 damon-005.spec adult-001-7days-bg.in
 
 check_true  online-dfa-reversed 5 towards-001.spec test-towards-001-true.in
 check_false online-dfa-reversed 5 towards-001.spec test-towards-001-false.in
@@ -136,16 +142,18 @@ check_false online-dfa-reversed 5 towards-006.spec test-towards-006-false.in
 check_true  online-dfa-reversed 5 towards-006.spec adult-001-dt-30-bg.in
 
 #### Online DFA (qtrlwe2)
-check_false online-dfa-qtrlwe2 5 damon-001.spec adult-001-bg.in
-check_true  online-dfa-qtrlwe2 5 damon-001.spec adult-001-bg-true.in
-check_false online-dfa-qtrlwe2 5 damon-002.spec adult-001-dbg.in
-check_true  online-dfa-qtrlwe2 5 damon-002.spec adult-001-dbg-true.in
-check_true  online-dfa-qtrlwe2 5 damon-004.spec test-damon-004-true.in
-check_false online-dfa-qtrlwe2 5 damon-004.spec test-damon-004-false.in
-check_false online-dfa-qtrlwe2 5 damon-004.spec adult-001-bg.in
-check_true  online-dfa-qtrlwe2 5 damon-005.spec test-damon-005-true.in
-check_false online-dfa-qtrlwe2 5 damon-005.spec test-damon-005-false.in
-check_true  online-dfa-qtrlwe2 5 damon-005.spec adult-001-bg.in
+check_false  online-dfa-qtrlwe2 5 damon-001.spec test-damon-001-false.in
+check_true   online-dfa-qtrlwe2 5 damon-001.spec test-damon-001-true.in
+check_false  online-dfa-qtrlwe2 5 damon-001.spec adult-001-7days-bg.in
+check_false  online-dfa-qtrlwe2 5 damon-002.spec test-damon-002-false.in
+check_true   online-dfa-qtrlwe2 5 damon-002.spec test-damon-002-true.in
+check_false  online-dfa-qtrlwe2 5 damon-002.spec adult-001-7days-dbg.in
+check_true   online-dfa-qtrlwe2 5 damon-004.spec test-damon-004-true.in
+check_false  online-dfa-qtrlwe2 5 damon-004.spec test-damon-004-false.in
+check_true   online-dfa-qtrlwe2 5 damon-004.spec adult-001-7days-bg.in
+check_true   online-dfa-qtrlwe2 5 damon-005.spec test-damon-005-true.in
+check_false  online-dfa-qtrlwe2 5 damon-005.spec test-damon-005-false.in
+check_true   online-dfa-qtrlwe2 5 damon-005.spec adult-001-7days-bg.in
 
 check_true  online-dfa-qtrlwe2 5 towards-001.spec test-towards-001-true.in
 check_false online-dfa-qtrlwe2 5 towards-001.spec test-towards-001-false.in
