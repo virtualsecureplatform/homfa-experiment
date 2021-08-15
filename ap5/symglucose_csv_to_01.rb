@@ -33,8 +33,8 @@ when "bg"
       next
     end
 
-    v = hist(row[2].to_f, min: 0, max: 31, step: 10)
-    print_bits(v, 5)
+    v = hist(row[2].to_f, min: 0, max: 63, step: 10)
+    print_bits(v, 6)
   end
 when "dbg"
   first = true
