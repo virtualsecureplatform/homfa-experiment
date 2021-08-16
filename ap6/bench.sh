@@ -13,16 +13,16 @@ failwith(){
 run_benchmark(){
     case "$1" in
         "offline" )
-	    $BENCHMARK offline --spec $2 --in $3 --bootstrapping-freq 30000 --ap 5  > "$OUTDIR/$1_$2_$3.log"
+	    $BENCHMARK offline --spec $2 --in $3 --bootstrapping-freq 30000 --ap 6  > "$OUTDIR/$1_$2_$3.log"
             ;;
         "reversed" )
-            $BENCHMARK reversed  --spec $2 --in $3 --bootstrapping-freq 30000 --out-freq 15 --ap 5 --spec-reversed > "$OUTDIR/$1_$2_$3.log"
+            $BENCHMARK reversed  --spec $2 --in $3 --bootstrapping-freq 30000 --out-freq 15 --ap 6 --spec-reversed > "$OUTDIR/$1_$2_$3.log"
             ;;
         "qtrlwe2" )
-	    $BENCHMARK qtrlwe2 --spec $2 --in $3 --bootstrapping-freq 1 --out-freq 15 --ap 5 --queue-size 15 --max-second-lut-depth 8 > "$OUTDIR/$1_$2_$3.log"
+	    $BENCHMARK qtrlwe2 --spec $2 --in $3 --bootstrapping-freq 1 --out-freq 15 --ap 6 --queue-size 15 --max-second-lut-depth 8 > "$OUTDIR/$1_$2_$3.log"
             ;;
         "plain" )
-	    $BENCHMARK plain --spec $2 --in $3 --out-freq 15 --ap 5 > "$OUTDIR/$1_$2_$3.log"
+	    $BENCHMARK plain --spec $2 --in $3 --out-freq 15 --ap 6 > "$OUTDIR/$1_$2_$3.log"
             ;;
         * )
             failwith "Invalid run $1"
