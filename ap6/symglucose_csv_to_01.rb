@@ -49,8 +49,8 @@ when "dbg"
       next
     end
 
-    v = 16 + hist(row[2].to_f - prev, min: -16, max: 15, step: 1)
-    print_bits(v, 5)
+    v = 32 + hist(row[2].to_f - prev, min: -32, max: 31, step: 1)
+    print_bits(v, 6)
     #$stderr.puts "#{row[2].to_f - prev}\t#{v - 16}"
     prev = row[2].to_f
   end
