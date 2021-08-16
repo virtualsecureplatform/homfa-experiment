@@ -19,8 +19,8 @@ gen_reversed_spec(){
 
 DAMON_001='G((p0 & p1 & p2 & !p3 & !p4 & !p5) | (p3 & !p4 & !p5) | (!p1 & !p2 & !p3 & p4 & !p5))'
 DAMON_002='G ((!p5 &  p4 &  p3 & !p2 &  p1 &  p0) | (!p5 &  p4 &  p3 &  p2 & !p1 & !p0) | (!p5 &  p4 &  p3 &  p2 & !p1 &  p0) | (!p5 &  p4 &  p3 &  p2 &  p1 & !p0) | (!p5 &  p4 &  p3 &  p2 &  p1 &  p0) | (!p5 & !p4 & !p3 & !p2 & !p1 & !p0) | (!p5 & !p4 & !p3 & !p2 & !p1 &  p0) | (!p5 & !p4 & !p3 & !p2 &  p1 & !p0))'
-DAMON_004='((!p5 & !p4 & !p3) & ((p2 & !p1 & p0) | (p2 & !p1 & !p0) | (!p2 & p1 & p0) | (!p2 & p1 & !p0) | (!p2 & !p1 & p0) | (!p2 & !p1 & !p0))) -> F[0, 25] ((p2 & p1 & !p0) | (p2 & p1 & p0) | p3 | p4 | p5)'
-DAMON_005='p5 | (p4 & p2) | (p4 & p3) -> F[0, 25]((!p5 & p4 & !p3 & !p2) | (!p5 & !p4))'
+DAMON_004='G(((!p5 & !p4 & !p3) & ((p2 & !p1 & p0) | (p2 & !p1 & !p0) | (!p2 & p1 & p0) | (!p2 & p1 & !p0) | (!p2 & !p1 & p0) | (!p2 & !p1 & !p0))) -> F[0, 25] ((p2 & p1 & !p0) | (p2 & p1 & p0) | p3 | p4 | p5))'
+DAMON_005='G(p5 | (p4 & p2) | (p4 & p3) -> F[0, 25]((!p5 & p4 & !p3 & !p2) | (!p5 & !p4)))'
 gen_spec "$DAMON_001" damon-001.spec 6
 gen_spec "$DAMON_002" damon-002.spec 6
 gen_spec "$DAMON_004" damon-004.spec 6
