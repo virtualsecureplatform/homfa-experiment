@@ -13,16 +13,16 @@ failwith(){
 run_benchmark(){
     case "$1" in
         "offline" )
-	    $BENCHMARK offline --spec $2 --in $3 --bootstrapping-freq 30000 --ap 6  > "$OUTDIR/$1_$2_$3.log"
+            { /usr/bin/time -v $BENCHMARK offline --spec $2 --in $3 --bootstrapping-freq 30000 --ap 6  > "$OUTDIR/$1_$2_$3.log" ; } 2> "$OUTDIR/$1_$2_$3_mem.log"
             ;;
         "reversed" )
-            $BENCHMARK reversed  --spec $2 --in $3 --bootstrapping-freq 30000 --out-freq 30 --ap 6 --spec-reversed > "$OUTDIR/$1_$2_$3.log"
+            { /usr/bin/time -v $BENCHMARK reversed  --spec $2 --in $3 --bootstrapping-freq 30000 --out-freq 30 --ap 6 --spec-reversed > "$OUTDIR/$1_$2_$3.log" ; } 2> "$OUTDIR/$1_$2_$3_mem.log"
             ;;
         "qtrlwe2" )
-	    $BENCHMARK qtrlwe2 --spec $2 --in $3 --bootstrapping-freq 1 --out-freq 30 --ap 6 --queue-size 15 --max-second-lut-depth 8 > "$OUTDIR/$1_$2_$3.log"
+            { /usr/bin/time -v $BENCHMARK qtrlwe2 --spec $2 --in $3 --bootstrapping-freq 1 --out-freq 30 --ap 6 --queue-size 15 --max-second-lut-depth 8 > "$OUTDIR/$1_$2_$3.log" ; } 2> "$OUTDIR/$1_$2_$3_mem.log"
             ;;
         "plain" )
-	    $BENCHMARK plain --spec $2 --in $3 --out-freq 30 --ap 6 > "$OUTDIR/$1_$2_$3.log"
+            { /usr/bin/time -v $BENCHMARK plain --spec $2 --in $3 --out-freq 30 --ap 6 > "$OUTDIR/$1_$2_$3.log" ; } 2> "$OUTDIR/$1_$2_$3_mem.log"
             ;;
         * )
             failwith "Invalid run $1"
