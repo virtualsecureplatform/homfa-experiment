@@ -31,6 +31,11 @@ enc_run_dec(){
     	"dfa-plain" )
 	    $HOMFA run-dfa-plain --ap "$2" --spec "$3" --in "$4"
             ;;
+	"online-dfa-blockbackstream" )
+            $HOMFA enc --ap "$2" --key _test_sk --in "$4" --out _test_in
+            $HOMFA run-online-dfa --method block-backstream --bkey _test_bk --spec "$3" --in _test_in --out _test_out
+            $HOMFA dec --key _test_sk --in _test_out
+            ;;
         * )
             failwith "Invalid run $1"
             ;;
@@ -109,6 +114,21 @@ check_true   online-dfa-qtrlwe2 6 damon-004.spec adult-001-7days-bg.in
 check_true   online-dfa-qtrlwe2 6 damon-005.spec test-damon-005-true.in
 check_false  online-dfa-qtrlwe2 6 damon-005.spec test-damon-005-false.in
 check_true   online-dfa-qtrlwe2 6 damon-005.spec adult-001-7days-bg.in
+
+### Online DFA (BlockBackStream)
+check_false  online-dfa-blockbackstream 6 damon-001.spec test-damon-001-false.in
+check_true   online-dfa-blockbackstream 6 damon-001.spec test-damon-001-true.in
+check_false  online-dfa-blockbackstream 6 damon-001.spec adult-001-7days-bg.in
+check_false  online-dfa-blockbackstream 6 damon-002.spec test-damon-002-false.in
+check_true   online-dfa-blockbackstream 6 damon-002.spec test-damon-002-true.in
+check_false  online-dfa-blockbackstream 6 damon-002.spec adult-001-7days-dbg.in
+check_true   online-dfa-blockbackstream 6 damon-004.spec test-damon-004-true.in
+check_false  online-dfa-blockbackstream 6 damon-004.spec test-damon-004-false.in
+check_true   online-dfa-blockbackstream 6 damon-004.spec adult-001-7days-bg.in
+check_true   online-dfa-blockbackstream 6 damon-005.spec test-damon-005-true.in
+check_false  online-dfa-blockbackstream 6 damon-005.spec test-damon-005-false.in
+check_true   online-dfa-blockbackstream 6 damon-005.spec adult-001-7days-bg.in
+
 
 ### Clean up temporary files
 rm _test_sk _test_bk _test_in _test_out #_test_random.log

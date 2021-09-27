@@ -21,6 +21,9 @@ run_benchmark(){
         "qtrlwe2" )
             { /usr/bin/time -v $BENCHMARK qtrlwe2 --spec $2 --in $3 --bootstrapping-freq 1 --out-freq 30 --ap 6 --queue-size 15 --max-second-lut-depth 8 > "$OUTDIR/$1_$2_$3.log" ; } 2> "$OUTDIR/$1_$2_$3_mem.log"
             ;;
+        "bbs" )
+            { /usr/bin/time -v $BENCHMARK bbs --spec $2 --in $3 --out-freq 30 --ap 6 --queue-size 30 > "$OUTDIR/$1_$2_$3.log" ; } 2> "$OUTDIR/$1_$2_$3_mem.log"
+            ;;
         "plain" )
             { /usr/bin/time -v $BENCHMARK plain --spec $2 --in $3 --out-freq 30 --ap 6 > "$OUTDIR/$1_$2_$3.log" ; } 2> "$OUTDIR/$1_$2_$3_mem.log"
             ;;
@@ -36,44 +39,41 @@ run_benchmark plain    damon-001.spec adult-001-7days-bg.in
 run_benchmark offline  damon-001.spec adult-001-7days-bg.in
 run_benchmark reversed damon-001-rev.spec adult-001-7days-bg.in
 run_benchmark qtrlwe2  damon-001.spec adult-001-7days-bg.in
+run_benchmark bbs      damon-001.spec adult-001-7days-bg.in
 
 run_benchmark plain    damon-002.spec adult-001-7days-dbg.in
 run_benchmark offline  damon-002.spec adult-001-7days-dbg.in
 run_benchmark reversed damon-002-rev.spec adult-001-7days-dbg.in
 run_benchmark qtrlwe2  damon-002.spec adult-001-7days-dbg.in
+run_benchmark bbs      damon-002.spec adult-001-7days-dbg.in
 
 run_benchmark plain    damon-004.spec adult-001-7days-bg.in
 run_benchmark offline  damon-004.spec adult-001-7days-bg.in
 run_benchmark reversed damon-004-rev.spec adult-001-7days-bg.in
 run_benchmark qtrlwe2  damon-004.spec adult-001-7days-bg.in
+run_benchmark bbs      damon-004.spec adult-001-7days-bg.in
 
 run_benchmark plain    damon-005.spec adult-001-7days-bg.in
 run_benchmark offline  damon-005.spec adult-001-7days-bg.in
 run_benchmark reversed damon-005-rev.spec adult-001-7days-bg.in
 run_benchmark qtrlwe2  damon-005.spec adult-001-7days-bg.in
+run_benchmark bbs      damon-005.spec adult-001-7days-bg.in
 
 run_benchmark plain    towards-001.spec adult-001-night-bg.in
 run_benchmark offline  towards-001.spec adult-001-night-bg.in
 run_benchmark reversed towards-001-rev.spec adult-001-night-bg.in
 run_benchmark qtrlwe2  towards-001.spec adult-001-night-bg.in
+run_benchmark bbs      towards-001.spec adult-001-night-bg.in
 
 run_benchmark plain    towards-002.spec adult-001-night-bg.in
 run_benchmark offline  towards-002.spec adult-001-night-bg.in
 run_benchmark reversed towards-002-rev.spec adult-001-night-bg.in
 run_benchmark qtrlwe2  towards-002.spec adult-001-night-bg.in
+run_benchmark bbs      towards-002.spec adult-001-night-bg.in
 
 run_benchmark plain    towards-004.spec adult-001-night-bg.in
 run_benchmark offline  towards-004.spec adult-001-night-bg.in
 #run_benchmark reversed towards-004-rev.spec adult-001-night-bg.in
 run_benchmark qtrlwe2  towards-004.spec adult-001-night-bg.in
-
-#run_benchmark plain    towards-005.spec adult-001-7days-bg.in
-#run_benchmark offline  towards-005.spec adult-001-7days-bg.in
-#run_benchmark reversed towards-005.spec adult-001-7days-bg.in
-#run_benchmark qtrlwe2  towards-005.spec adult-001-7days-bg.in
-#
-#run_benchmark plain    towards-006.spec adult-001-7days-bg.in
-#run_benchmark offline  towards-006.spec adult-001-7days-bg.in
-#run_benchmark reversed towards-006.spec adult-001-7days-bg.in
-#run_benchmark qtrlwe2  towards-006.spec adult-001-7days-bg.in
+run_benchmark bbs      towards-004.spec adult-001-night-bg.in
 
