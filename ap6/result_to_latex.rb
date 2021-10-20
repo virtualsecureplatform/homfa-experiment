@@ -82,6 +82,13 @@ logfile_names = [
   "qtrlwe2_towards-001.spec_adult-001-night-bg.in.log",
   "qtrlwe2_towards-002.spec_adult-001-night-bg.in.log",
   "qtrlwe2_towards-004.spec_adult-001-night-bg.in.log",
+  "bbs_damon-001.spec_adult-001-7days-bg.in.log",
+  "bbs_damon-002.spec_adult-001-7days-dbg.in.log",
+  "bbs_damon-004.spec_adult-001-7days-bg.in.log",
+  "bbs_damon-005.spec_adult-001-7days-bg.in.log",
+  "bbs_towards-001.spec_adult-001-night-bg.in.log",
+  "bbs_towards-002.spec_adult-001-night-bg.in.log",
+  "bbs_towards-004.spec_adult-001-night-bg.in.log",
 ]
 
 data2 = logfile_names.map { |filename| [filename, { enc_sum: [], run_sum: [], dec_sum: [] }] }.to_h
@@ -145,17 +152,17 @@ def tos(mean, stddev)
 end
 
 def print(sio, data2, spec_filename, log_file, id, states, states_rev, in_size)
+  nrows_per_method = 4
   offline_filename = "offline_#{spec_filename}.spec_#{log_file}"
   reversed_filename = "reversed_#{spec_filename}-rev.spec_#{log_file}"
-  qtrlwe2_filename = "qtrlwe2_#{spec_filename}.spec_#{log_file}"
 
   run_mean = data2[offline_filename][:run_sum].mean
   run_stddev = data2[offline_filename][:run_sum].stddev
   sio <<
-    "\\multirow{3}{*}{$\\#{id}$}&" <<
-    "\\multirow{3}{*}{#{states}}&" <<
-    "\\multirow{3}{*}{#{states_rev}}&" <<
-    "\\multirow{3}{*}{#{in_size}}& offline &" <<
+    "\\multirow{#{nrows_per_method}}{*}{$\\#{id}$}&" <<
+    "\\multirow{#{nrows_per_method}}{*}{#{states}}&" <<
+    "\\multirow{#{nrows_per_method}}{*}{#{states_rev}}&" <<
+    "\\multirow{#{nrows_per_method}}{*}{#{in_size}}& offline &" <<
     tos(run_mean / 10 ** 6, run_stddev / 10 ** 6) << "&" <<
     tos(run_mean / in_size / 10 ** 3, run_stddev / in_size / 10 ** 3) <<
     "\\\\\n"
@@ -171,12 +178,15 @@ def print(sio, data2, spec_filename, log_file, id, states, states_rev, in_size)
     sio << "&&&&reversed&---&---\\\\\n"
   end
 
-  run_mean = data2[qtrlwe2_filename][:run_sum].mean
-  run_stddev = data2[qtrlwe2_filename][:run_sum].stddev
-  sio << "&&&&qtrlwe2&" <<
-    tos(run_mean / 10 ** 6, run_stddev / 10 ** 6) << "&" <<
-    tos(run_mean / in_size / 10 ** 3, run_stddev / in_size / 10 ** 3) <<
-    "\\\\\n"
+  ["qtrlwe2", "bbs"].each do |name|
+    filename = "#{name}_#{spec_filename}.spec_#{log_file}"
+    run_mean = data2[filename][:run_sum].mean
+    run_stddev = data2[filename][:run_sum].stddev
+    sio << "&&&&#{name}&" <<
+      tos(run_mean / 10 ** 6, run_stddev / 10 ** 6) << "&" <<
+      tos(run_mean / in_size / 10 ** 3, run_stddev / in_size / 10 ** 3) <<
+      "\\\\\n"
+  end
 end
 
 sio3 = StringIO.new
