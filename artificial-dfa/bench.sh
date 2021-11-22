@@ -1,4 +1,4 @@
-#!/usr/bin/bash -eux
+#!/usr/bin/bash -eu
 
 BUILD_BIN=${BUILD_BIN:-"build/bin"}
 BENCHMARK=$BUILD_BIN/benchmark
@@ -9,6 +9,7 @@ FLUT_QUEUE_SIZE=15
 FLUT_MAX_SECOND_LUT_DEPTH=8
 REVERSED_BOOTSTRAPPING_FREQ=30000
 OFFLINE_BOOTSTRAPPING_FREQ=30000
+RUN_ONLY_PLAIN=${RUN_ONLY_PLAIN:-"0"}
 
 failwith(){
     echo -ne "\e[1;31m[ERROR]\e[0m "
@@ -48,6 +49,11 @@ run_benchmark(){
     # Debug print
     echo -e "[$(date +'%Y-%m-%d %H:%M:%S')] Running benchmark: $1 $2 $3 > $log_file_prefix"
 
+    if [ $RUN_ONLY_PLAIN != "0" -a $1 != "plain" ]; then
+        echo -e "\t=> RUN_ONLY_PLAIN flag is set, so skip."
+        return
+    fi
+
     case "$1" in
         "reversed" )
             run_homfa reversed $rev_spec_filepath $input_filepath $log_file_prefix
@@ -56,6 +62,8 @@ run_benchmark(){
             run_homfa $1 $spec_filepath $input_filepath $log_file_prefix
             ;;
     esac
+
+    echo -e "\t=> done."
 }
 
 mkdir $OUTDIR
@@ -66,8 +74,44 @@ run_benchmark reversed size-0010 size-10000bit
 run_benchmark bbs      size-0010 size-10000bit
 run_benchmark qtrlwe2  size-0010 size-10000bit
 
-#run_benchmark plain    size-0010 size-100000bit
-#run_benchmark offline  size-0010 size-100000bit
-#run_benchmark reversed size-0010 size-100000bit
-#run_benchmark bbs      size-0010 size-100000bit
-#run_benchmark qtrlwe2  size-0010 size-100000bit
+run_benchmark plain    size-0010 size-100000bit
+run_benchmark offline  size-0010 size-100000bit
+run_benchmark reversed size-0010 size-100000bit
+run_benchmark bbs      size-0010 size-100000bit
+run_benchmark qtrlwe2  size-0010 size-100000bit
+
+run_benchmark plain    size-0100 size-10000bit
+run_benchmark offline  size-0100 size-10000bit
+run_benchmark reversed size-0100 size-10000bit
+run_benchmark bbs      size-0100 size-10000bit
+run_benchmark qtrlwe2  size-0100 size-10000bit
+
+run_benchmark plain    size-0100 size-100000bit
+run_benchmark offline  size-0100 size-100000bit
+run_benchmark reversed size-0100 size-100000bit
+run_benchmark bbs      size-0100 size-100000bit
+run_benchmark qtrlwe2  size-0100 size-100000bit
+
+run_benchmark plain    size-0500 size-10000bit
+run_benchmark offline  size-0500 size-10000bit
+run_benchmark reversed size-0500 size-10000bit
+run_benchmark bbs      size-0500 size-10000bit
+run_benchmark qtrlwe2  size-0500 size-10000bit
+
+run_benchmark plain    size-0500 size-100000bit
+run_benchmark offline  size-0500 size-100000bit
+run_benchmark reversed size-0500 size-100000bit
+run_benchmark bbs      size-0500 size-100000bit
+run_benchmark qtrlwe2  size-0500 size-100000bit
+
+run_benchmark plain    size-1000 size-10000bit
+run_benchmark offline  size-1000 size-10000bit
+run_benchmark reversed size-1000 size-10000bit
+run_benchmark bbs      size-1000 size-10000bit
+run_benchmark qtrlwe2  size-1000 size-10000bit
+
+run_benchmark plain    size-1000 size-100000bit
+run_benchmark offline  size-1000 size-100000bit
+run_benchmark reversed size-1000 size-100000bit
+run_benchmark bbs      size-1000 size-100000bit
+run_benchmark qtrlwe2  size-1000 size-100000bit
