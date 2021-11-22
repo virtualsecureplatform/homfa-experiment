@@ -89,6 +89,16 @@ logfile_names = [
   "bbs_towards-001.spec_adult-001-night-bg.in.log",
   "bbs_towards-002.spec_adult-001-night-bg.in.log",
   "bbs_towards-004.spec_adult-001-night-bg.in.log",
+
+  "qtrlwe2-1_damon-001.spec_adult-001-7days-bg.in.log",
+  "qtrlwe2-5_damon-001.spec_adult-001-7days-bg.in.log",
+  "qtrlwe2-10_damon-001.spec_adult-001-7days-bg.in.log",
+  "qtrlwe2-15_damon-001.spec_adult-001-7days-bg.in.log",
+
+  "qtrlwe2-1_towards-001.spec_adult-001-night-bg.in.log",
+  "qtrlwe2-5_towards-001.spec_adult-001-night-bg.in.log",
+  "qtrlwe2-10_towards-001.spec_adult-001-night-bg.in.log",
+  "qtrlwe2-15_towards-001.spec_adult-001-night-bg.in.log",
 ]
 
 data2 = logfile_names.map { |filename| [filename, { enc_sum: [], run_sum: [], dec_sum: [] }] }.to_h
@@ -190,13 +200,13 @@ def print(sio, data2, spec_filename, log_file, id, states, states_rev, in_size)
 end
 
 sio3 = StringIO.new
-print sio3, data2, "towards-001", "adult-001-night-bg.in.log", "psi_1", 7215, 1856014, 4326
-print sio3, data2, "towards-002", "adult-001-night-bg.in.log", "psi_2", 6015, 1531414, 4326
-print sio3, data2, "towards-004", "adult-001-night-bg.in.log", "psi_4", 4617, "---", 4326
-print sio3, data2, "damon-001", "adult-001-7days-bg.in.log", "phi_1", 13, 13, 60486
-print sio3, data2, "damon-002", "adult-001-7days-dbg.in.log", "phi_2", 13, 13, 60480
-print sio3, data2, "damon-004", "adult-001-7days-bg.in.log", "phi_4", 186, 186, 60486
-print sio3, data2, "damon-005", "adult-001-7days-bg.in.log", "phi_5", 234, 234, 60486
+print sio3, data2, "towards-001", "adult-001-night-bg.in.log", "psi_1", 7215, 1856014, (4326 / 6)
+print sio3, data2, "towards-002", "adult-001-night-bg.in.log", "psi_2", 6015, 1531414, (4326 / 6)
+print sio3, data2, "towards-004", "adult-001-night-bg.in.log", "psi_4", 4617, "---", (4326 / 6)
+print sio3, data2, "damon-001", "adult-001-7days-bg.in.log", "phi_1", 13, 13, (60486 / 6)
+print sio3, data2, "damon-002", "adult-001-7days-dbg.in.log", "phi_2", 13, 13, (60480 / 6)
+print sio3, data2, "damon-004", "adult-001-7days-bg.in.log", "phi_4", 186, 186, (60486 / 6)
+print sio3, data2, "damon-005", "adult-001-7days-bg.in.log", "phi_5", 234, 234, (60486 / 6)
 puts sio3.string
 
 #puts sio3.string
