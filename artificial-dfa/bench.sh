@@ -76,16 +76,16 @@ mkdir $OUTDIR
 
 ruby gen_bench_automaton.rb 10   > spec/size-0010.spec
 ruby gen_bench_automaton.rb 10   > spec/size-0010-rev.spec
-ruby gen_bench_automaton.rb 50   > spec/size-0010.spec
-ruby gen_bench_automaton.rb 50   > spec/size-0010-rev.spec
+ruby gen_bench_automaton.rb 50   > spec/size-0050.spec
+ruby gen_bench_automaton.rb 50   > spec/size-0050-rev.spec
 ruby gen_bench_automaton.rb 100  > spec/size-0100.spec
 ruby gen_bench_automaton.rb 100  > spec/size-0100-rev.spec
-ruby gen_bench_automaton.rb 200  > spec/size-0100.spec
-ruby gen_bench_automaton.rb 200  > spec/size-0100-rev.spec
-ruby gen_bench_automaton.rb 300  > spec/size-0100.spec
-ruby gen_bench_automaton.rb 300  > spec/size-0100-rev.spec
-ruby gen_bench_automaton.rb 400  > spec/size-0100.spec
-ruby gen_bench_automaton.rb 400  > spec/size-0100-rev.spec
+ruby gen_bench_automaton.rb 200  > spec/size-0200.spec
+ruby gen_bench_automaton.rb 200  > spec/size-0200-rev.spec
+ruby gen_bench_automaton.rb 300  > spec/size-0300.spec
+ruby gen_bench_automaton.rb 300  > spec/size-0300-rev.spec
+ruby gen_bench_automaton.rb 400  > spec/size-0400.spec
+ruby gen_bench_automaton.rb 400  > spec/size-0400-rev.spec
 ruby gen_bench_automaton.rb 500  > spec/size-0500.spec
 ruby gen_bench_automaton.rb 500  > spec/size-0500-rev.spec
 #ruby gen_bench_automaton.rb 1000 > spec/size-1000.spec
