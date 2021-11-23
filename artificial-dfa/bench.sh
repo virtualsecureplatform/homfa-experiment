@@ -76,19 +76,27 @@ mkdir $OUTDIR
 
 ruby gen_bench_automaton.rb 10   > spec/size-0010.spec
 ruby gen_bench_automaton.rb 10   > spec/size-0010-rev.spec
+ruby gen_bench_automaton.rb 50   > spec/size-0010.spec
+ruby gen_bench_automaton.rb 50   > spec/size-0010-rev.spec
 ruby gen_bench_automaton.rb 100  > spec/size-0100.spec
 ruby gen_bench_automaton.rb 100  > spec/size-0100-rev.spec
+ruby gen_bench_automaton.rb 200  > spec/size-0100.spec
+ruby gen_bench_automaton.rb 200  > spec/size-0100-rev.spec
+ruby gen_bench_automaton.rb 300  > spec/size-0100.spec
+ruby gen_bench_automaton.rb 300  > spec/size-0100-rev.spec
+ruby gen_bench_automaton.rb 400  > spec/size-0100.spec
+ruby gen_bench_automaton.rb 400  > spec/size-0100-rev.spec
 ruby gen_bench_automaton.rb 500  > spec/size-0500.spec
 ruby gen_bench_automaton.rb 500  > spec/size-0500-rev.spec
-ruby gen_bench_automaton.rb 1000 > spec/size-1000.spec
-ruby gen_bench_automaton.rb 1000 > spec/size-1000-rev.spec
+#ruby gen_bench_automaton.rb 1000 > spec/size-1000.spec
+#ruby gen_bench_automaton.rb 1000 > spec/size-1000-rev.spec
 seq 10000 | while read line; do echo -n 1; done | ruby ../01tobin.rb 1 > in/size-10000bit.in
 seq 20000 | while read line; do echo -n 1; done | ruby ../01tobin.rb 1 > in/size-20000bit.in
 seq 30000 | while read line; do echo -n 1; done | ruby ../01tobin.rb 1 > in/size-30000bit.in
 seq 40000 | while read line; do echo -n 1; done | ruby ../01tobin.rb 1 > in/size-40000bit.in
 seq 50000 | while read line; do echo -n 1; done | ruby ../01tobin.rb 1 > in/size-50000bit.in
 
-num_states=(0010 0100 0500 1000)
+num_states=(0010 0050 0100 0200 0300 0400 0500)
 num_inputs=(10000 20000 30000 40000 50000)
 
 for num_state in "${num_states[@]}"; do
