@@ -88,37 +88,17 @@ seq 30000 | while read line; do echo -n 1; done | ruby ../01tobin.rb 1 > in/size
 seq 40000 | while read line; do echo -n 1; done | ruby ../01tobin.rb 1 > in/size-40000bit.in
 seq 50000 | while read line; do echo -n 1; done | ruby ../01tobin.rb 1 > in/size-50000bit.in
 
-declare -A QN=(
-    ["0010"]="10000"
-    ["0100"]="10000"
-    ["0500"]="10000"
-    ["1000"]="10000"
-    ["0010"]="20000"
-    ["0100"]="20000"
-    ["0500"]="20000"
-    ["1000"]="20000"
-    ["0010"]="30000"
-    ["0100"]="30000"
-    ["0500"]="30000"
-    ["1000"]="30000"
-    ["0010"]="40000"
-    ["0100"]="40000"
-    ["0500"]="40000"
-    ["1000"]="40000"
-    ["0010"]="50000"
-    ["0100"]="50000"
-    ["0500"]="50000"
-    ["1000"]="50000"
-)
+num_states=(0010 0100 0500 1000)
+num_inputs=(10000 20000 30000 40000 50000)
 
-for Q in "${!QN[@]}"; do
-    N="${QN[$Q]}"
-
-    run_benchmark plain    "size-${Q}" "size-${N}bit"
-    run_benchmark offline  "size-${Q}" "size-${N}bit"
-    run_benchmark reversed "size-${Q}" "size-${N}bit"
-    run_benchmark bbs-50   "size-${Q}" "size-${N}bit"
-    run_benchmark bbs-100  "size-${Q}" "size-${N}bit"
-    run_benchmark bbs-150  "size-${Q}" "size-${N}bit"
-    #run_benchmark qtrlwe2  "size-${Q}" "size-${N}bit"
+for num_state in "${num_states[@]}"; do
+    for num_input in "${num_inputs[@]}"; do
+        run_benchmark plain    "size-${num_state}" "size-${num_input}bit"
+        run_benchmark offline  "size-${num_state}" "size-${num_input}bit"
+        run_benchmark reversed "size-${num_state}" "size-${num_input}bit"
+        run_benchmark bbs-50   "size-${num_state}" "size-${num_input}bit"
+        run_benchmark bbs-100  "size-${num_state}" "size-${num_input}bit"
+        run_benchmark bbs-150  "size-${num_state}" "size-${num_input}bit"
+        #run_benchmark qtrlwe2  "size-${num_state}" "size-${num_input}bit"
+    done
 done
