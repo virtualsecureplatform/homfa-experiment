@@ -3,6 +3,9 @@
 BUILD_BIN=${BUILD_BIN:-"build/bin"}
 BENCHMARK=$BUILD_BIN/benchmark
 OUTDIR=$(date +'log-%Y%m%d%H%M%S')
+BOOTSTRAPPING_FREQ=30000
+QTRLWE2_QUEUE_SIZE=15
+QTRLWE2_MAX_SECOND_LUT_DEPTH=8
 
 failwith(){
     echo -ne "\e[1;31m[ERROR]\e[0m "
@@ -11,69 +14,103 @@ failwith(){
 }
 
 run_benchmark(){
-    case "$1" in
+    local mode=$1
+    local ap_size=$2
+    local spec_filepath=$3
+    local input_filepath=$4
+    local output_freq=$5
+    local logfile="$OUTDIR/${mode}_${spec_filepath}_${input_filepath}_${output_freq}.log"
+    local logfile_mem="$OUTDIR/${mode}_${spec_filepath}_${input_filepath}_${output_freq}_mem.log"
+
+    case $mode in
         "offline" )
-            { /usr/bin/time -v $BENCHMARK offline --spec $2 --in $3 --bootstrapping-freq 30000 --ap 6  > "$OUTDIR/$1_$2_$3.log" ; } 2> "$OUTDIR/$1_$2_$3_mem.log"
+            { /usr/bin/time -v \
+                $BENCHMARK offline \
+                    --spec $spec_filepath \
+                    --in $input_filepath \
+                    --bootstrapping-freq $BOOTSTRAPPING_FREQ \
+                    --ap $ap_size \
+                    > $logfile ; } 2> $logfile_mem
             ;;
+
         "reversed" )
-            { /usr/bin/time -v $BENCHMARK reversed  --spec $2 --in $3 --bootstrapping-freq 30000 --out-freq 30 --ap 6 --spec-reversed > "$OUTDIR/$1_$2_$3.log" ; } 2> "$OUTDIR/$1_$2_$3_mem.log"
+            { /usr/bin/time -v \
+                $BENCHMARK reversed \
+                    --spec $spec_filepath \
+                    --in $input_filepath \
+                    --bootstrapping-freq $BOOTSTRAPPING_FREQ \
+                    --out-freq $output_freq \
+                    --ap $ap_size \
+                    --spec-reversed \
+                    > $logfile ; } 2> $logfile_mem
             ;;
-        "qtrlwe2" )
-            { /usr/bin/time -v $BENCHMARK qtrlwe2 --spec $2 --in $3 --bootstrapping-freq 1 --out-freq 30 --ap 6 --queue-size 15 --max-second-lut-depth 8 > "$OUTDIR/$1_$2_$3.log" ; } 2> "$OUTDIR/$1_$2_$3_mem.log"
+
+        "qtrlwe2" | "flut" )
+            { /usr/bin/time -v \
+                $BENCHMARK qtrlwe2 \
+                    --spec $spec_filepath \
+                    --in $input_filepath \
+                    --bootstrapping-freq 1 \
+                    --out-freq $output_freq \
+                    --ap $ap_size \
+                    --queue-size $QTRLWE2_QUEUE_SIZE \
+                    --max-second-lut-depth $QTRLWE2_MAX_SECOND_LUT_DEPTH \
+                    > $logfile ; } 2> $logfile_mem
             ;;
+
         "bbs" )
-            { /usr/bin/time -v $BENCHMARK bbs --spec $2 --in $3 --out-freq 30 --ap 6 --queue-size 30 > "$OUTDIR/$1_$2_$3.log" ; } 2> "$OUTDIR/$1_$2_$3_mem.log"
+            { /usr/bin/time -v \
+                $BENCHMARK bbs \
+                    --spec $spec_filepath \
+                    --in $input_filepath \
+                    --out-freq $output_freq \
+                    --ap $ap_size \
+                    --queue-size $output_freq \
+                    > $logfile ; } 2> $logfile_mem
             ;;
+
         "plain" )
-            { /usr/bin/time -v $BENCHMARK plain --spec $2 --in $3 --out-freq 30 --ap 6 > "$OUTDIR/$1_$2_$3.log" ; } 2> "$OUTDIR/$1_$2_$3_mem.log"
+            { /usr/bin/time -v \
+                $BENCHMARK plain \
+                    --spec $spec_filepath \
+                    --in $input_filepath \
+                    --out-freq $output_freq \
+                    --ap $ap_size \
+                    > $logfile ; } 2> $logfile_mem
             ;;
+
         * )
             failwith "Invalid run $1"
             ;;
     esac
 }
 
+run_test(){
+    local ap_size=$1
+    local spec_filepath=$2
+    local spec_rev_filepath=$3
+    local input_filepath=$4
+    local output_freq=$5
+    local reversed_enabled=$6
+
+    run_benchmark plain $ap_size $spec_filepath $input_filepath $output_freq
+    run_benchmark offline $ap_size $spec_filepath $input_filepath 0
+    if [ $reversed_enabled -eq 1 ]; then
+        run_benchmark reversed $ap_size $spec_rev_filepath $input_filepath $output_freq
+    fi
+    #run_benchmark flut $ap_size $spec_filepath $input_filepath $output_freq
+    run_benchmark bbs $ap_size $spec_filepath $input_filepath $output_freq
+}
+
 mkdir $OUTDIR
 
-run_benchmark plain    damon-001.spec adult-001-7days-bg.in
-run_benchmark offline  damon-001.spec adult-001-7days-bg.in
-run_benchmark reversed damon-001-rev.spec adult-001-7days-bg.in
-run_benchmark qtrlwe2  damon-001.spec adult-001-7days-bg.in
-run_benchmark bbs      damon-001.spec adult-001-7days-bg.in
+if [ ! -f $BENCHMARK ]; then
+    failwith "File benchmark not found in $BENCHMARK"
+fi
 
-run_benchmark plain    damon-002.spec adult-001-7days-dbg.in
-run_benchmark offline  damon-002.spec adult-001-7days-dbg.in
-run_benchmark reversed damon-002-rev.spec adult-001-7days-dbg.in
-run_benchmark qtrlwe2  damon-002.spec adult-001-7days-dbg.in
-run_benchmark bbs      damon-002.spec adult-001-7days-dbg.in
-
-run_benchmark plain    damon-004.spec adult-001-7days-bg.in
-run_benchmark offline  damon-004.spec adult-001-7days-bg.in
-run_benchmark reversed damon-004-rev.spec adult-001-7days-bg.in
-run_benchmark qtrlwe2  damon-004.spec adult-001-7days-bg.in
-run_benchmark bbs      damon-004.spec adult-001-7days-bg.in
-
-run_benchmark plain    damon-005.spec adult-001-7days-bg.in
-run_benchmark offline  damon-005.spec adult-001-7days-bg.in
-run_benchmark reversed damon-005-rev.spec adult-001-7days-bg.in
-run_benchmark qtrlwe2  damon-005.spec adult-001-7days-bg.in
-run_benchmark bbs      damon-005.spec adult-001-7days-bg.in
-
-run_benchmark plain    towards-001.spec adult-001-night-bg.in
-run_benchmark offline  towards-001.spec adult-001-night-bg.in
-run_benchmark reversed towards-001-rev.spec adult-001-night-bg.in
-run_benchmark qtrlwe2  towards-001.spec adult-001-night-bg.in
-run_benchmark bbs      towards-001.spec adult-001-night-bg.in
-
-run_benchmark plain    towards-002.spec adult-001-night-bg.in
-run_benchmark offline  towards-002.spec adult-001-night-bg.in
-run_benchmark reversed towards-002-rev.spec adult-001-night-bg.in
-run_benchmark qtrlwe2  towards-002.spec adult-001-night-bg.in
-run_benchmark bbs      towards-002.spec adult-001-night-bg.in
-
-run_benchmark plain    towards-004.spec adult-001-night-bg.in
-run_benchmark offline  towards-004.spec adult-001-night-bg.in
-#run_benchmark reversed towards-004-rev.spec adult-001-night-bg.in
-run_benchmark qtrlwe2  towards-004.spec adult-001-night-bg.in
-run_benchmark bbs      towards-004.spec adult-001-night-bg.in
-
+run_test 9 damon-001.spec   damon-001-rev.spec   adult-001-7days-bg.in 45 1
+run_test 9 damon-004.spec   damon-004-rev.spec   adult-001-7days-bg.in 45 1
+run_test 9 damon-005.spec   damon-005-rev.spec   adult-001-7days-bg.in 45 1
+run_test 9 towards-001.spec towards-001-rev.spec adult-001-night-bg.in 45 0
+run_test 9 towards-002.spec towards-002-rev.spec adult-001-night-bg.in 45 0
+run_test 9 towards-004.spec towards-004-rev.spec adult-001-night-bg.in 45 0
