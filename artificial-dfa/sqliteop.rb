@@ -1,6 +1,7 @@
 #!/usr/bin/ruby
 
 require "sqlite3"
+require "numo/gnuplot"
 
 module Enumerable
   def sum
@@ -24,6 +25,10 @@ module Enumerable
   def stddev
     Math.sqrt(var)
   end
+end
+
+def open_db
+  SQLite3::Database.new "artificial-dfa.sqlite3"
 end
 
 def import_result(table_name, result_dir)
@@ -285,7 +290,7 @@ def import_result(table_name, result_dir)
   end
 
   # dump
-  db = SQLite3::Database.new "artificial-dfa.sqlite3"
+  db = open_db
   db.execute <<-SQL
     CREATE TABLE #{table_name} (
       algorithm TEXT,
@@ -357,7 +362,100 @@ end
 
 def print_usage_and_exit
   $stderr.puts "Usage: #{$0} import TABLE-NAME RESULT-DIR"
+  $stderr.puts "Usage: #{$0} plot   TABLE-NAME "
   exit 1
+end
+
+def print_gnuplot(table_name)
+  fixed_state_size = 500
+  fixed_input_size = 50000
+  yrange_when_fixed_state = "[0:400]"
+  yrange_when_fixed_input = "[0:400]"
+
+  data_state = {}
+  data_input = {}
+  db = open_db
+  db.execute("SELECT algorithm,state_size,input_size/1000,run_mean/1000000.0,run_stddev/1000000.0 FROM #{table_name} WHERE state_size = ? AND run_mean IS NOT NULL", fixed_state_size).each do |fields|
+    algorithm, state_size, input_size, run_mean, run_stddev = fields
+    data_state["#{algorithm}"] ||= []
+    data_state["#{algorithm}"].push([input_size, run_mean, run_stddev])
+  end
+  db.execute("SELECT algorithm,state_size,input_size/1000,run_mean/1000000.0,run_stddev/1000000.0 FROM #{table_name} WHERE input_size = ? AND run_mean IS NOT NULL", fixed_input_size).each do |fields|
+    algorithm, state_size, input_size, run_mean, run_stddev = fields
+    data_input["#{algorithm}"] ||= []
+    data_input["#{algorithm}"].push([state_size, run_mean, run_stddev])
+  end
+
+  titles = ["offline", "reversed", "bbs-50", "bbs-150"]
+  line_style = [1, 2, 3, 4]
+  point_style = [1, 2, 4, 5]
+
+  points_state = []
+  titles.each_with_index do |key, index|
+    values = data_state[key]
+    #points_state.push([
+    #  *values.transpose,
+    #  with: :errorbars,
+    #  notitle: true,
+    #  lt: index,
+    #  lw: 3,
+    #])
+    points_state.push([
+      *values.transpose,
+      with: :linespoints,
+      title: key,
+      lt: line_style[index],
+      lw: 2,
+      pt: point_style[index],
+      ps: 1,
+    ])
+  end
+
+  points_input = []
+  titles.each_with_index do |key, index|
+    values = data_input[key]
+    #points_input.push([
+    #  *values.transpose,
+    #  with: :errorbars,
+    #  notitle: true,
+    #  lt: index,
+    #  lw: 2,
+    #])
+    points_input.push([
+      *values.transpose,
+      with: :linespoints,
+      title: key,
+      lt: line_style[index],
+      lw: 2,
+      pt: point_style[index],
+      ps: 1,
+    ])
+  end
+
+  Numo.gnuplot do
+    set :terminal, :pdf
+    set :output, "#{table_name}-fixed-state.pdf"
+    set :monochrom
+    set :key, :left, :top
+    set :xlabel, "n (Kbits)"
+    set :ylabel, "time (sec)"
+    set :xrange, "[5:55]"
+    set :yrange, yrange_when_fixed_state
+    set :key, :spacing, 0.7
+    plot *points_state
+  end
+  Numo.gnuplot do
+    set :terminal, :pdf
+    set :output, "#{table_name}-fixed-input.pdf"
+    set :monochrom
+    set :key, :left, :top
+    set :xlabel, "m (states)"
+    set :ylabel, "time (sec)"
+    set :xrange, "[0:510]"
+    set :yrange, yrange_when_fixed_input
+    set :key, :spacing, 0.7
+    plot *points_input
+  end
 end
 
 print_usage_and_exit unless ARGV.size >= 1
@@ -366,6 +464,9 @@ case ARGV[0]
 when "import"
   print_usage_and_exit unless ARGV.size == 3
   import_result ARGV[1], ARGV[2]
+when "plot"
+  print_usage_and_exit unless ARGV.size == 2
+  print_gnuplot(ARGV[1])
 else
   print_usage_and_exit
 end
