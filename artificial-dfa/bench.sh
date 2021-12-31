@@ -4,7 +4,7 @@ BUILD_BIN=${BUILD_BIN:-"build/bin"}
 BENCHMARK=$BUILD_BIN/benchmark
 OUTDIR="log/$(date +'%Y%m%d%H%M%S')"
 NUM_AP=1
-OUT_FREQ=${OUT_FREQ:-"30"}
+OUT_FREQ=150
 FLUT_QUEUE_SIZE=15
 FLUT_MAX_SECOND_LUT_DEPTH=8
 REVERSED_BOOTSTRAPPING_FREQ=30000
@@ -29,13 +29,13 @@ run_homfa(){
             { /usr/bin/time -v $BENCHMARK qtrlwe2 --spec $2 --in $3 --bootstrapping-freq 1 --out-freq $OUT_FREQ --ap $NUM_AP --queue-size $FLUT_QUEUE_SIZE --max-second-lut-depth $FLUT_MAX_SECOND_LUT_DEPTH > "$OUTDIR/$4.log" ; } 2> "$OUTDIR/$4_mem.log"
             ;;
         "bbs-50" )
-            { /usr/bin/time -v $BENCHMARK bbs --spec $2 --in $3 --out-freq 50 --ap $NUM_AP --queue-size 50 > "$OUTDIR/$4.log" ; } 2> "$OUTDIR/$4_mem.log"
+            { /usr/bin/time -v $BENCHMARK bbs --spec $2 --in $3 --out-freq $OUT_FREQ --ap $NUM_AP --queue-size 50 > "$OUTDIR/$4.log" ; } 2> "$OUTDIR/$4_mem.log"
             ;;
-        "bbs-100" )
-            { /usr/bin/time -v $BENCHMARK bbs --spec $2 --in $3 --out-freq 100 --ap $NUM_AP --queue-size 100 > "$OUTDIR/$4.log" ; } 2> "$OUTDIR/$4_mem.log"
-            ;;
+        #"bbs-100" )
+        #    { /usr/bin/time -v $BENCHMARK bbs --spec $2 --in $3 --out-freq 100 --ap $NUM_AP --queue-size 100 > "$OUTDIR/$4.log" ; } 2> "$OUTDIR/$4_mem.log"
+        #    ;;
         "bbs-150" )
-            { /usr/bin/time -v $BENCHMARK bbs --spec $2 --in $3 --out-freq 150 --ap $NUM_AP --queue-size 150 > "$OUTDIR/$4.log" ; } 2> "$OUTDIR/$4_mem.log"
+            { /usr/bin/time -v $BENCHMARK bbs --spec $2 --in $3 --out-freq $OUT_FREQ --ap $NUM_AP --queue-size 150 > "$OUTDIR/$4.log" ; } 2> "$OUTDIR/$4_mem.log"
             ;;
         "plain" )
             { /usr/bin/time -v $BENCHMARK plain --spec $2 --in $3 --out-freq $OUT_FREQ --ap $NUM_AP > "$OUTDIR/$4.log" ; } 2> "$OUTDIR/$4_mem.log"
@@ -105,7 +105,7 @@ for num_state in "${num_states[@]}"; do
         run_benchmark offline  "size-${num_state}" "size-${num_input}bit"
         run_benchmark reversed "size-${num_state}" "size-${num_input}bit"
         run_benchmark bbs-50   "size-${num_state}" "size-${num_input}bit"
-        run_benchmark bbs-100  "size-${num_state}" "size-${num_input}bit"
+        #run_benchmark bbs-100  "size-${num_state}" "size-${num_input}bit"
         run_benchmark bbs-150  "size-${num_state}" "size-${num_input}bit"
         #run_benchmark qtrlwe2  "size-${num_state}" "size-${num_input}bit"
     done

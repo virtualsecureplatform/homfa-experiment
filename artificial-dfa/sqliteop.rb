@@ -369,8 +369,8 @@ end
 def print_gnuplot(table_name)
   fixed_state_size = 500
   fixed_input_size = 50000
-  yrange_when_fixed_state = "[0:400]"
-  yrange_when_fixed_input = "[0:400]"
+  yrange_when_fixed_state = "[0:450]"
+  yrange_when_fixed_input = "[0:450]"
 
   data_state = {}
   data_input = {}
@@ -386,12 +386,13 @@ def print_gnuplot(table_name)
     data_input["#{algorithm}"].push([state_size, run_mean, run_stddev])
   end
 
-  titles = ["offline", "reversed", "bbs-50", "bbs-150"]
+  keys = ["offline", "reversed", "bbs-50", "bbs-150"]
+  titles = ["offline", "reversed", "bbs(B=50)", "bbs(B=150)"]
   line_style = [1, 2, 3, 4]
   point_style = [1, 2, 4, 5]
 
   points_state = []
-  titles.each_with_index do |key, index|
+  keys.each_with_index do |key, index|
     values = data_state[key]
     #points_state.push([
     #  *values.transpose,
@@ -403,7 +404,7 @@ def print_gnuplot(table_name)
     points_state.push([
       *values.transpose,
       with: :linespoints,
-      title: key,
+      title: titles[index],
       lt: line_style[index],
       lw: 2,
       pt: point_style[index],
@@ -412,7 +413,7 @@ def print_gnuplot(table_name)
   end
 
   points_input = []
-  titles.each_with_index do |key, index|
+  keys.each_with_index do |key, index|
     values = data_input[key]
     #points_input.push([
     #  *values.transpose,
@@ -424,7 +425,7 @@ def print_gnuplot(table_name)
     points_input.push([
       *values.transpose,
       with: :linespoints,
-      title: key,
+      title: titles[index],
       lt: line_style[index],
       lw: 2,
       pt: point_style[index],
@@ -433,27 +434,30 @@ def print_gnuplot(table_name)
   end
 
   Numo.gnuplot do
-    set :terminal, :pdf
+    set :terminal, :pdf, :font, "Helvetica,20"
     set :output, "#{table_name}-fixed-state.pdf"
     set :monochrom
     set :key, :left, :top
+    set :key, :Left
     set :xlabel, "n (Kbits)"
     set :ylabel, "time (sec)"
     set :xrange, "[5:55]"
     set :yrange, yrange_when_fixed_state
-    set :key, :spacing, 0.7
+    set :key, :spacing, 0.9
     plot *points_state
   end
+
   Numo.gnuplot do
-    set :terminal, :pdf
+    set :terminal, :pdf, :font, "Helvetica,20"
     set :output, "#{table_name}-fixed-input.pdf"
     set :monochrom
     set :key, :left, :top
+    set :key, :Left
     set :xlabel, "m (states)"
     set :ylabel, "time (sec)"
     set :xrange, "[0:510]"
     set :yrange, yrange_when_fixed_input
-    set :key, :spacing, 0.7
+    set :key, :spacing, 0.9
     plot *points_input
   end
 end
