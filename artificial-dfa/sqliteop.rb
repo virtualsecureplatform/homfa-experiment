@@ -388,8 +388,10 @@ def print_gnuplot(table_name)
     data_input["#{algorithm}"].push([state_size, run_mean, run_stddev])
   end
 
-  keys = ["offline", "reversed", "bbs-150"]
-  titles = ["Offline", "ReverseStream", "BlockStream"]
+  keys = ["reversed", "bbs-150"]
+  titles = ["ReverseStream", "BlockStream"]
+  #keys = ["offline", "reversed", "bbs-150"]
+  #titles = ["Offline", "ReverseStream", "BlockStream"]
   #titles = ["\\Cref{alg:offline}", "\\Cref{alg:reversed}", "\\Cref{alg:bbs}"]
   line_style = [1, 2, 3, 4]
   point_style = [1, 2, 4, 5]
