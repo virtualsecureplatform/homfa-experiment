@@ -232,27 +232,27 @@ def export_latex_tabular(table_name)
   d = OpenStruct.new(data)
   puts <<"EOS".gsub("%", "\\")
 %begin{tabular}{ccccc|r|r}%toprule
-formula                   & %#states              & %#rev states                 & %#inputs               & algorithm          & time (s)        & time (ms/input)   %%%midrule
+formula                   & %#states              & %#rev states                 & %#inputs               & algorithm          & time (s)                   & time (ms/input)   %%%midrule
 
-%multirow{3}{*}{$%psi_1$} & %multirow{3}{*}{10524} & %multirow{3}{*}{2712974}    & %multirow{3}{*}{721}   & %ref{alg:offline}  & $#{d.off_psi1_r}$ & $#{d.off_psi1_rpi}$ %%
-                          &                        &                             &                        & %ref{alg:reversed} & $#{d.rev_psi1_r}$ & $#{d.rev_psi1_rpi}$ %%
-                          &                        &                             &                        & %ref{alg:bbs}      & $#{d.bbs_psi1_r}$ & $#{d.bbs_psi1_rpi}$ %%%hline
-%multirow{3}{*}{$%psi_2$} & %multirow{3}{*}{11126} & %multirow{3}{*}{2885376}    & %multirow{3}{*}{721}   & %ref{alg:offline}  & $#{d.off_psi2_r}$ & $#{d.off_psi2_rpi}$ %%
-                          &                        &                             &                        & %ref{alg:reversed} & $#{d.rev_psi2_r}$ & $#{d.rev_psi2_rpi}$ %%
-                          &                        &                             &                        & %ref{alg:bbs}      & $#{d.bbs_psi2_r}$ & $#{d.bbs_psi2_rpi}$ %%%hline
-%multirow{3}{*}{$%psi_4$} & %multirow{3}{*}{7026}  & %multirow{3}{*}{---}        & %multirow{3}{*}{721}   & %ref{alg:offline}  & $#{d.off_psi4_r}$ & $#{d.off_psi4_rpi}$ %%
-                          &                        &                             &                        & %ref{alg:reversed} & $#{d.rev_psi4_r}$ & $#{d.rev_psi4_rpi}$ %%
-                          &                        &                             &                        & %ref{alg:bbs}      & $#{d.bbs_psi4_r}$ & $#{d.bbs_psi4_rpi}$ %%%midrule%midrule
+%multirow{3}{*}{$%psi_1$} & %multirow{3}{*}{10524} & %multirow{3}{*}{2712974}    & %multirow{3}{*}{721}   & %FHOffline        & $#{d.off_psi1_r}$          & $#{d.off_psi1_rpi}$ %%
+                          &                        &                             &                        & %ReverseStream    & $#{d.rev_psi1_r}$          & $#{d.rev_psi1_rpi}$ %%
+                          &                        &                             &                        & %BlockStream      & $%mathbf{#{d.bbs_psi1_r}}$ & $%mathbf{#{d.bbs_psi1_rpi}}$ %%%hline
+%multirow{3}{*}{$%psi_2$} & %multirow{3}{*}{11126} & %multirow{3}{*}{2885376}    & %multirow{3}{*}{721}   & %FHOffline        & $#{d.off_psi2_r}$          & $#{d.off_psi2_rpi}$ %%
+                          &                        &                             &                        & %ReverseStream    & $#{d.rev_psi2_r}$          & $#{d.rev_psi2_rpi}$ %%
+                          &                        &                             &                        & %BlockStream      & $%mathbf{#{d.bbs_psi2_r}}$ & $%mathbf{#{d.bbs_psi2_rpi}}$ %%%hline
+%multirow{3}{*}{$%psi_4$} & %multirow{3}{*}{7026}  & %multirow{3}{*}{---}        & %multirow{3}{*}{721}   & %FHOffline        & $#{d.off_psi4_r}$          & $#{d.off_psi4_rpi}$ %%
+                          &                        &                             &                        & %ReverseStream    & $#{d.rev_psi4_r}$          & $#{d.rev_psi4_rpi}$ %%
+                          &                        &                             &                        & %BlockStream      & $%mathbf{#{d.bbs_psi4_r}}$ & $%mathbf{#{d.bbs_psi4_rpi}}$ %%%midrule%midrule
 
-%multirow{3}{*}{$%phi_1$} & %multirow{3}{*}{21}    & %multirow{3}{*}{20}         & %multirow{3}{*}{10081} & %ref{alg:offline}  & $#{d.off_phi1_r}$ & $#{d.off_phi1_rpi}$ %%
-                          &                        &                             &                        & %ref{alg:reversed} & $#{d.rev_phi1_r}$ & $#{d.rev_phi1_rpi}$ %%
-                          &                        &                             &                        & %ref{alg:bbs}      & $#{d.bbs_phi1_r}$ & $#{d.bbs_phi1_rpi}$ %%%hline
-%multirow{3}{*}{$%phi_4$} & %multirow{3}{*}{237}   & %multirow{3}{*}{237}        & %multirow{3}{*}{10081} & %ref{alg:offline}  & $#{d.off_phi4_r}$ & $#{d.off_phi4_rpi}$ %%
-                          &                        &                             &                        & %ref{alg:reversed} & $#{d.rev_phi4_r}$ & $#{d.rev_phi4_rpi}$ %%
-                          &                        &                             &                        & %ref{alg:bbs}      & $#{d.bbs_phi4_r}$ & $#{d.bbs_phi4_rpi}$ %%%hline
-%multirow{3}{*}{$%phi_5$} & %multirow{3}{*}{390}   & %multirow{3}{*}{390}        & %multirow{3}{*}{10081} & %ref{alg:offline}  & $#{d.off_phi5_r}$ & $#{d.off_phi5_rpi}$ %%
-                          &                        &                             &                        & %ref{alg:reversed} & $#{d.rev_phi5_r}$ & $#{d.rev_phi5_rpi}$ %%
-                          &                        &                             &                        & %ref{alg:bbs}      & $#{d.bbs_phi5_r}$ & $#{d.bbs_phi5_rpi}$ %%%bottomrule
+%multirow{3}{*}{$%phi_1$} & %multirow{3}{*}{21}    & %multirow{3}{*}{20}         & %multirow{3}{*}{10081} & %FHOffline        & $#{d.off_phi1_r}$          & $#{d.off_phi1_rpi}$ %%
+                          &                        &                             &                        & %ReverseStream    & $%mathbf{#{d.rev_phi1_r}}$ & $%mathbf{#{d.rev_phi1_rpi}}$ %%
+                          &                        &                             &                        & %BlockStream      & $#{d.bbs_phi1_r}$          & $#{d.bbs_phi1_rpi}$ %%%hline
+%multirow{3}{*}{$%phi_4$} & %multirow{3}{*}{237}   & %multirow{3}{*}{237}        & %multirow{3}{*}{10081} & %FHOffline        & $#{d.off_phi4_r}$          & $#{d.off_phi4_rpi}$ %%
+                          &                        &                             &                        & %ReverseStream    & $%mathbf{#{d.rev_phi4_r}}$ & $%mathbf{#{d.rev_phi4_rpi}}$ %%
+                          &                        &                             &                        & %BlockStream      & $#{d.bbs_phi4_r}$          & $#{d.bbs_phi4_rpi}$ %%%hline
+%multirow{3}{*}{$%phi_5$} & %multirow{3}{*}{390}   & %multirow{3}{*}{390}        & %multirow{3}{*}{10081} & %FHOffline        & $#{d.off_phi5_r}$          & $#{d.off_phi5_rpi}$ %%
+                          &                        &                             &                        & %ReverseStream    & $%mathbf{#{d.rev_phi5_r}}$ & $%mathbf{#{d.rev_phi5_rpi}}$ %%
+                          &                        &                             &                        & %BlockStream      & $#{d.bbs_phi5_r}$          & $#{d.bbs_phi5_rpi}$ %%%bottomrule
 %end{tabular}
 EOS
 end

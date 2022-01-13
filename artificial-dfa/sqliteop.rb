@@ -370,8 +370,9 @@ end
 def print_gnuplot(table_name)
   fixed_state_size = 500
   fixed_input_size = 50000
-  yrange_when_fixed_state = "[0:450]"
-  yrange_when_fixed_input = "[0:450]"
+  yrange_when_fixed_state = "[0:150]"
+  yrange_when_fixed_input = "[0:150]"
+  term_tikz_size = "8,5"
 
   data_state = {}
   data_input = {}
@@ -387,8 +388,9 @@ def print_gnuplot(table_name)
     data_input["#{algorithm}"].push([state_size, run_mean, run_stddev])
   end
 
-  keys = ["offline", "reversed", "bbs-50", "bbs-150"]
-  titles = ["offline", "reversed", "bbs(B=50)", "bbs(B=150)"]
+  keys = ["offline", "reversed", "bbs-150"]
+  titles = ["Offline", "ReverseStream", "BlockStream"]
+  #titles = ["\\Cref{alg:offline}", "\\Cref{alg:reversed}", "\\Cref{alg:bbs}"]
   line_style = [1, 2, 3, 4]
   point_style = [1, 2, 4, 5]
 
@@ -435,12 +437,15 @@ def print_gnuplot(table_name)
   end
 
   Numo.gnuplot do
-    set :terminal, :pdf, :font, "Helvetica,20"
-    set :output, "#{table_name}-fixed-state.pdf"
+    set :term, :lua, :tikz
+    set :output, "#{table_name}-fixed-state.tex"
+    set :term, :tikz, :size, term_tikz_size
+    #set :terminal, :pdf, :font, "Helvetica,20"
+    #set :output, "#{table_name}-fixed-state.pdf"
     set :monochrom
     set :key, :left, :top
     set :key, :Left
-    set :xlabel, "n (Kbits)"
+    set :xlabel, "Number of Monitored Ciphertexts ($\\times 10^3$)"
     set :ylabel, "time (sec)"
     set :xrange, "[5:55]"
     set :yrange, yrange_when_fixed_state
@@ -449,12 +454,15 @@ def print_gnuplot(table_name)
   end
 
   Numo.gnuplot do
-    set :terminal, :pdf, :font, "Helvetica,20"
-    set :output, "#{table_name}-fixed-input.pdf"
+    set :term, :lua, :tikz
+    set :output, "#{table_name}-fixed-input.tex"
+    set :term, :tikz, :size, term_tikz_size
+    #set :terminal, :pdf, :font, "Helvetica,20"
+    #set :output, "#{table_name}-fixed-input.pdf"
     set :monochrom
     set :key, :left, :top
     set :key, :Left
-    set :xlabel, "m (states)"
+    set :xlabel, "Number of States (states)"
     set :ylabel, "time (sec)"
     set :xrange, "[0:510]"
     set :yrange, yrange_when_fixed_input
