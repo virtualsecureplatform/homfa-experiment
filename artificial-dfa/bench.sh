@@ -72,7 +72,7 @@ run_benchmark(){
     echo -e "\t=> done."
 }
 
-mkdir $OUTDIR
+mkdir -p $OUTDIR
 
 ruby gen_bench_automaton.rb 10   > spec/size-0010.spec
 ruby gen_bench_automaton.rb 10   > spec/size-0010-rev.spec

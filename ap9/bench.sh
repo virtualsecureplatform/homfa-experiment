@@ -102,7 +102,7 @@ run_test(){
     run_benchmark bbs $ap_size $spec_filepath $input_filepath $output_freq
 }
 
-mkdir $OUTDIR
+mkdir -p $OUTDIR
 
 if [ ! -f $BENCHMARK ]; then
     failwith "File benchmark not found in $BENCHMARK"
