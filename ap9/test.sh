@@ -109,15 +109,6 @@ check_false  online-dfa-reversed 9 damon-004-rev.spec adult-001-7days-bg.in
 check_true   online-dfa-reversed 9 damon-005-rev.spec test-damon-005-true.in
 check_false  online-dfa-reversed 9 damon-005-rev.spec test-damon-005-false.in
 check_false  online-dfa-reversed 9 damon-005-rev.spec adult-001-7days-bg.in
-#check_false  online-dfa-reversed 9 towards-001-rev.spec test-towards-001-false.in
-#check_true   online-dfa-reversed 9 towards-001-rev.spec test-towards-001-true.in
-#check_true   online-dfa-reversed 9 towards-001-rev.spec adult-001-7days-bg.in
-#check_false  online-dfa-reversed 9 towards-002-rev.spec test-towards-002-false.in
-#check_true   online-dfa-reversed 9 towards-002-rev.spec test-towards-002-true.in
-#check_true   online-dfa-reversed 9 towards-002-rev.spec adult-001-7days-bg.in
-#check_false  online-dfa-reversed 9 towards-004-rev.spec test-towards-004-false.in
-#check_true   online-dfa-reversed 9 towards-004-rev.spec test-towards-004-true.in
-#check_false  online-dfa-reversed 9 towards-004-rev.spec adult-001-7days-bg.in
 
 #### Online DFA (qtrlwe2)
 check_false  online-dfa-qtrlwe2 9 damon-001.spec test-damon-001-false.in
