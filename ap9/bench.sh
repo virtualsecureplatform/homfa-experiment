@@ -4,8 +4,6 @@ BUILD_BIN=${BUILD_BIN:-"build/bin"}
 BENCHMARK=$BUILD_BIN/benchmark
 OUTDIR=$(date +'log-%Y%m%d%H%M%S')
 BOOTSTRAPPING_FREQ=30000
-QTRLWE2_QUEUE_SIZE=15
-QTRLWE2_MAX_SECOND_LUT_DEPTH=8
 
 failwith(){
     echo -ne "\e[1;31m[ERROR]\e[0m "
@@ -42,19 +40,6 @@ run_benchmark(){
                     --out-freq $output_freq \
                     --ap $ap_size \
                     --spec-reversed \
-                    > $logfile ; } 2> $logfile_mem
-            ;;
-
-        "qtrlwe2" | "flut" )
-            { /usr/bin/time -v \
-                $BENCHMARK qtrlwe2 \
-                    --spec $spec_filepath \
-                    --in $input_filepath \
-                    --bootstrapping-freq 1 \
-                    --out-freq $output_freq \
-                    --ap $ap_size \
-                    --queue-size $QTRLWE2_QUEUE_SIZE \
-                    --max-second-lut-depth $QTRLWE2_MAX_SECOND_LUT_DEPTH \
                     > $logfile ; } 2> $logfile_mem
             ;;
 
@@ -98,7 +83,6 @@ run_test(){
     if [ $reversed_enabled -eq 1 ]; then
         run_benchmark reversed $ap_size $spec_rev_filepath $input_filepath $output_freq
     fi
-    #run_benchmark flut $ap_size $spec_filepath $input_filepath $output_freq
     run_benchmark bbs $ap_size $spec_filepath $input_filepath $output_freq
 }
 
