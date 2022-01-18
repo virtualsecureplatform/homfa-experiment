@@ -108,9 +108,9 @@ if [ ! -f $BENCHMARK ]; then
     failwith "File benchmark not found in $BENCHMARK"
 fi
 
-run_test 9 damon-001.spec   damon-001-rev.spec   adult-001-7days-bg.in 45 1
-run_test 9 damon-004.spec   damon-004-rev.spec   adult-001-7days-bg.in 45 1
-run_test 9 damon-005.spec   damon-005-rev.spec   adult-001-7days-bg.in 45 1
-run_test 9 towards-001.spec towards-001-rev.spec adult-001-night-bg.in 45 1
-run_test 9 towards-002.spec towards-002-rev.spec adult-001-night-bg.in 45 1
-run_test 9 towards-004.spec towards-004-rev.spec adult-001-night-bg.in 45 0
+run_test 9 damon-001.spec   damon-001-rev.spec   adult-001-7days-bg.in 9 1
+run_test 9 damon-004.spec   damon-004-rev.spec   adult-001-7days-bg.in 9 1
+run_test 9 damon-005.spec   damon-005-rev.spec   adult-001-7days-bg.in 9 1
+run_test 9 towards-001.spec towards-001-rev.spec adult-001-night-bg.in 9 1
+run_test 9 towards-002.spec towards-002-rev.spec adult-001-night-bg.in 9 1
+run_test 9 towards-004.spec towards-004-rev.spec adult-001-night-bg.in 9 0
