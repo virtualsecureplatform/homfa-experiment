@@ -410,25 +410,11 @@ SQL
 end
 
 def get_fixed_state_data_from_db(table_name, fixed_state_size)
-  data_state = {}
-  db = open_db
-  db.execute("SELECT algorithm,state_size,input_size/1000,run_mean/1000000.0,run_stddev/1000000.0,mem_mean/1024.0/1024.0,mem_stddev/1024.0/1024.0 FROM #{table_name} WHERE state_size = ? AND run_mean IS NOT NULL", fixed_state_size).each do |fields|
-    algorithm = fields[0]
-    data_state["#{algorithm}"] ||= []
-    data_state["#{algorithm}"].push(fields[1..])
-  end
-  data_state
+  select_from_db table_name, w: "state_size = ?", v: [fixed_state_size]
 end
 
 def get_fixed_input_data_from_db(table_name, fixed_input_size)
-  data_input = {}
-  db = open_db
-  db.execute("SELECT algorithm,state_size,input_size/1000,run_mean/1000000.0,run_stddev/1000000.0,mem_mean/1024.0/1024.0,mem_stddev/1024.0/1024.0 FROM #{table_name} WHERE input_size = ? AND run_mean IS NOT NULL", fixed_input_size).each do |fields|
-    algorithm = fields[0]
-    data_input["#{algorithm}"] ||= []
-    data_input["#{algorithm}"].push(fields[1..])
-  end
-  data_input
+  select_from_db table_name, w: "input_size = ?", v: [fixed_input_size]
 end
 
 def print_tabular(table_name)
@@ -436,62 +422,55 @@ def print_tabular(table_name)
   fixed_input_size = 50000
   keys = ["reversed", "bbs-150"]
   titles = ["%ReverseStream", "%BlockStream"]
+  data_src = {
+    state_fixed: get_fixed_state_data_from_db(table_name, fixed_state_size),
+    input_fixed: get_fixed_input_data_from_db(table_name, fixed_input_size),
+  }
+  first_column_name_src = {
+    state_fixed: "%begin{tabular}{@{}c@{}}%# of%%Monitored%%Ciphertexts%end{tabular}",
+    input_fixed: "%begin{tabular}{@{}c@{}}%# of%%States%end{tabular}",
+  }
 
-  data_state = get_fixed_state_data_from_db(table_name, fixed_state_size)
-  data_input = get_fixed_input_data_from_db(table_name, fixed_input_size)
+  [:state_fixed, :input_fixed].each do |kind|
+    data = data_src[kind]
+    first_column_name = first_column_name_src[kind]
 
-  sio = StringIO.new
-  sio.puts <<"EOS"
+    sio = StringIO.new
+    ### Table header
+    sio.puts <<"EOS"
 %begin{tabular}{cc|cc}%toprule
-Algorithm & %begin{tabular}{@{}c@{}}%# of%%Monitored%%Ciphertexts%end{tabular} & %begin{tabular}{@{}c@{}}Average%%Runtime%%(s)%end{tabular} & %begin{tabular}{@{}c@{}}Average%%Memory%%Usage%%(GiB)%end{tabular}%%
+Algorithm & #{first_column_name} & %begin{tabular}{@{}c@{}}Average%%Runtime%%(s)%end{tabular} & %begin{tabular}{@{}c@{}}Average%%Memory%%Usage%%(GiB)%end{tabular}%%
 EOS
-  keys.each_with_index do |key, ki|
-    algorithm = titles[ki]
-    sio.puts "%midrule"
-    sio.puts "%multirow{#{data_state[key].size}}{*}{#{algorithm}}"
-    data_state[key].each_with_index do |fields, index|
-      state_size, input_size, run_mean, run_stddev, mem_mean, mem_stddev = fields
-      sio.puts " & #{input_size}000 & #{sprintf("%.2f", run_mean)} & #{sprintf("%.2f", mem_mean)}%%"
+    ### Table body
+    keys.each_with_index do |key, ki|
+      algorithm = titles[ki]
+      sio.puts "%midrule"
+      sio.puts "%multirow{#{data[key].size}}{*}{#{algorithm}}"
+      data[key].each_with_index do |fields, index|
+        state_size, input_size, run_mean, run_stddev, mem_mean, mem_stddev = fields
+        first_column_value = case kind
+          when :state_fixed
+            input_size
+          when :input_fixed
+            state_size
+          end
+        sio.puts " & #{first_column_value}000 & #{sprintf("%.2f", run_mean)} & #{sprintf("%.2f", mem_mean)}%%"
+      end
     end
-  end
-  sio.puts <<"EOS"
+    ### Table footer
+    sio.puts <<"EOS"
 %bottomrule
 %end{tabular}
 EOS
-  puts sio.string.gsub("%", "\\")
-  puts
-
-  sio = StringIO.new
-  sio.puts <<"EOS"
-%begin{tabular}{cc|cc}%toprule
-Algorithm & %begin{tabular}{@{}c@{}}%# of%%States%end{tabular} & %begin{tabular}{@{}c@{}}Average%%Runtime%%(s)%end{tabular} & %begin{tabular}{@{}c@{}}Average%%Memory%%Usage%%(GiB)%end{tabular}%%
-EOS
-  keys.each_with_index do |key, ki|
-    algorithm = titles[ki]
-    sio.puts "%midrule"
-    sio.puts "%multirow{#{data_input[key].size}}{*}{#{algorithm}}"
-    data_input[key].each_with_index do |fields, index|
-      state_size, input_size, run_mean, run_stddev, mem_mean, mem_stddev = fields
-      sio.puts " & #{state_size} & #{sprintf("%.2f", run_mean)} & #{sprintf("%.2f", mem_mean)}%%"
-    end
+    puts sio.string.gsub("%", "\\")
+    puts
   end
-  sio.puts <<"EOS"
-%bottomrule
-%end{tabular}
-EOS
-  puts sio.string.gsub("%", "\\")
-  puts
 end
 
 def print_gnuplot(table_name)
   fixed_state_size = 500
   fixed_input_size = 50000
-  yrange_when_fixed_state = "[0:150]"
-  yrange_when_fixed_input = "[0:150]"
   term_tikz_size = "8,5"
-
-  data_state = get_fixed_state_data_from_db(table_name, fixed_state_size)
-  data_input = get_fixed_input_data_from_db(table_name, fixed_input_size)
 
   keys = ["reversed", "bbs-150"]
   titles = ["ReverseStream", "BlockStream"]
@@ -500,94 +479,77 @@ def print_gnuplot(table_name)
   #titles = ["\\Cref{alg:offline}", "\\Cref{alg:reversed}", "\\Cref{alg:bbs}"]
   line_style = [1, 2, 3, 4]
   point_style = [1, 2, 4, 5]
+  data_src = {
+    state_fixed: get_fixed_state_data_from_db(table_name, fixed_state_size),
+    input_fixed: get_fixed_input_data_from_db(table_name, fixed_input_size),
+  }
+  state_input_src = {
+    state_fixed: 1,
+    input_fixed: 0,
+  }
+  output_filename_src = {
+    state_fixed: "#{table_name}-fixed-state",
+    input_fixed: "#{table_name}-fixed-input",
+  }
+  xylabel_src = {
+    state_fixed: ["Number of Monitored Ciphertexts ($\\times 10^3$)", "time (sec)"],
+    input_fixed: ["Number of States (states)", "time (sec)"],
+  }
+  xyrange_src = {
+    state_fixed: ["[5:55]", "[0:150]"],
+    input_fixed: ["[0:510]", "[0:150]"],
+  }
 
-  points_state = []
-  keys.each_with_index do |key, index|
-    values = data_state[key].map do |state_size, input_size, run_mean, run_stddev, mem_mean, mem_stddev|
-      [input_size, run_mean, run_stddev]
-    end
-    pp data_state[key]
-    #points_state.push([
-    #  *values.transpose,
-    #  with: :errorbars,
-    #  notitle: true,
-    #  lt: index,
-    #  lw: 3,
-    #])
-    points_state.push([
-      *values.transpose,
-      with: :linespoints,
-      title: titles[index],
-      lt: line_style[index],
-      lw: 2,
-      pt: point_style[index],
-      ps: 1,
-    ])
-  end
+  [:state_fixed, :input_fixed].each do |kind|
+    data = data_src[kind]
+    output_filename = output_filename_src[kind]
+    xlabel, ylabel = xylabel_src[kind]
+    xrange, yrange = xyrange_src[kind]
 
-  points_input = []
-  keys.each_with_index do |key, index|
-    values = data_input[key].map do |state_size, input_size, run_mean, run_stddev, mem_mean, mem_stddev|
-      [state_size, run_mean, run_stddev]
+    points = []
+    keys.each_with_index do |key, index|
+      values = data[key].map do |state_size, input_size, run_mean, run_stddev, mem_mean, mem_stddev|
+        size = [state_size, input_size][state_input_src[kind]]
+        [size, run_mean, run_stddev]
+      end
+      #points.push([
+      #  *values.transpose,
+      #  with: :errorbars,
+      #  notitle: true,
+      #  lt: index,
+      #  lw: 3,
+      #])
+      points.push([
+        *values.transpose,
+        with: :linespoints,
+        title: titles[index],
+        lt: line_style[index],
+        lw: 2,
+        pt: point_style[index],
+        ps: 1,
+      ])
     end
-    #points_input.push([
-    #  *values.transpose,
-    #  with: :errorbars,
-    #  notitle: true,
-    #  lt: index,
-    #  lw: 2,
-    #])
-    points_input.push([
-      *values.transpose,
-      with: :linespoints,
-      title: titles[index],
-      lt: line_style[index],
-      lw: 2,
-      pt: point_style[index],
-      ps: 1,
-    ])
-  end
 
-  Numo.gnuplot do
-    case $export_type
-    when :tex
-      set :term, :lua, :tikz
-      set :output, "#{table_name}-fixed-state.tex"
-      set :term, :tikz, :size, term_tikz_size
-    when :pdf
-      set :terminal, :pdf, :font, "Helvetica,20"
-      set :output, "#{table_name}-fixed-state.pdf"
+    Numo.gnuplot do
+      case $export_type
+      when :tex
+        set :term, :lua, :tikz
+        set :output, "#{output_filename}.tex"
+        set :term, :tikz, :size, term_tikz_size
+      when :pdf
+        set :terminal, :pdf, :font, "Helvetica,20"
+        set :output, "#{output_filename}.pdf"
+      end
+      set :monochrom
+      set :key, :left, :top
+      set :key, :Left
+      set :xlabel, xlabel
+      set :ylabel, ylabel
+      set :xrange, xrange
+      set :yrange, yrange
+      set :key, :spacing, 0.9
+      plot *points
     end
-    set :monochrom
-    set :key, :left, :top
-    set :key, :Left
-    set :xlabel, "Number of Monitored Ciphertexts ($\\times 10^3$)"
-    set :ylabel, "time (sec)"
-    set :xrange, "[5:55]"
-    set :yrange, yrange_when_fixed_state
-    set :key, :spacing, 0.9
-    plot *points_state
-  end
-
-  Numo.gnuplot do
-    case $export_type
-    when :tex
-      set :term, :lua, :tikz
-      set :output, "#{table_name}-fixed-input.tex"
-      set :term, :tikz, :size, term_tikz_size
-    when :pdf
-      set :terminal, :pdf, :font, "Helvetica,20"
-      set :output, "#{table_name}-fixed-input.pdf"
-    end
-    set :monochrom
-    set :key, :left, :top
-    set :key, :Left
-    set :xlabel, "Number of States (states)"
-    set :ylabel, "time (sec)"
-    set :xrange, "[0:510]"
-    set :yrange, yrange_when_fixed_input
-    set :key, :spacing, 0.9
-    plot *points_input
   end
 end
 
