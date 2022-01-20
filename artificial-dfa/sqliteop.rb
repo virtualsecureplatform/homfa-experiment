@@ -2,6 +2,10 @@
 
 require "sqlite3"
 require "numo/gnuplot"
+require "stringio"
+
+$export_type = :pdf
+#$export_type = :tex
 
 module Enumerable
   def sum
@@ -29,6 +33,11 @@ end
 
 def open_db
   SQLite3::Database.new "artificial-dfa.sqlite3"
+end
+
+def to_memlogfile(filename)
+  raise "invalid filename" unless filename =~ /^(.+)\.log$/
+  "#{$1}_mem.log"
 end
 
 def import_result(table_name, result_dir)
@@ -256,6 +265,7 @@ def import_result(table_name, result_dir)
       cmux_num: [],
       bs_sum: [],
       bs_num: [],
+      mem: [],
     }]
   }.to_h
 
@@ -287,6 +297,13 @@ def import_result(table_name, result_dir)
       data2[logfile_name][:enc_sum].push data[:enc].sum
       data2[logfile_name][:run_sum].push data[:run].sum
       data2[logfile_name][:dec_sum].push data[:dec].sum
+      # memory
+      mem_filename = to_memlogfile(filename)
+      File.open(mem_filename).each do |line|
+        next unless line =~ /Maximum resident set size \(kbytes\): ([0-9]+)$/
+        kbytes = $1.to_i
+        data2[logfile_name][:mem].push kbytes
+      end
     end
   end
 
@@ -325,6 +342,10 @@ def import_result(table_name, result_dir)
       bs_sum_stddev REAL,
       bs_num INTEGER,
 
+      mem_size INTEGER,
+      mem_mean REAL,
+      mem_stddev REAL,
+
       PRIMARY KEY (algorithm, state_size, input_size)
     );
   SQL
@@ -333,7 +354,7 @@ def import_result(table_name, result_dir)
     unless filename =~ /^([^_]+)_size-([0-9]+)_size-([0-9]+)bit\.log$/
       $stderr.puts "Regex not match: #{filename}"
     end
-    db.execute "INSERT INTO #{table_name} VALUES (?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?)",
+    db.execute "INSERT INTO #{table_name} VALUES (?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?)",
                $1,
                $2.to_i,
                $3.to_i,
@@ -357,14 +378,109 @@ def import_result(table_name, result_dir)
                data[:bs_sum].size,
                data[:bs_sum].mean,
                data[:bs_sum].stddev,
-               (data[:bs_num] || [0])[0]
+               (data[:bs_num] || [0])[0],
+               data[:mem].size,
+               data[:mem].mean,
+               data[:mem].stddev
   end
 end
 
 def print_usage_and_exit
-  $stderr.puts "Usage: #{$0} import TABLE-NAME RESULT-DIR"
-  $stderr.puts "Usage: #{$0} plot   TABLE-NAME "
+  $stderr.puts "Usage: #{$0} import  TABLE-NAME RESULT-DIR"
+  $stderr.puts "Usage: #{$0} plot    TABLE-NAME "
+  $stderr.puts "Usage: #{$0} tabular TABLE-NAME "
   exit 1
+end
+
+def select_from_db(table_name, w: "TRUE", v: [])
+  sql = <<"SQL"
+SELECT algorithm,state_size,input_size/1000,run_mean/1000000.0,run_stddev/1000000.0,mem_mean/1024.0/1024.0,mem_stddev/1024.0/1024.0
+FROM #{table_name}
+WHERE #{w}
+AND run_mean IS NOT NULL
+SQL
+  data = {}
+  db = open_db
+  db.execute(sql, *v).each do |fields|
+    algorithm = fields[0]
+    data[algorithm] ||= []
+    data[algorithm].push(fields[1..])
+  end
+  data
+end
+
+def get_fixed_state_data_from_db(table_name, fixed_state_size)
+  data_state = {}
+  db = open_db
+  db.execute("SELECT algorithm,state_size,input_size/1000,run_mean/1000000.0,run_stddev/1000000.0,mem_mean/1024.0/1024.0,mem_stddev/1024.0/1024.0 FROM #{table_name} WHERE state_size = ? AND run_mean IS NOT NULL", fixed_state_size).each do |fields|
+    algorithm = fields[0]
+    data_state["#{algorithm}"] ||= []
+    data_state["#{algorithm}"].push(fields[1..])
+  end
+  data_state
+end
+
+def get_fixed_input_data_from_db(table_name, fixed_input_size)
+  data_input = {}
+  db = open_db
+  db.execute("SELECT algorithm,state_size,input_size/1000,run_mean/1000000.0,run_stddev/1000000.0,mem_mean/1024.0/1024.0,mem_stddev/1024.0/1024.0 FROM #{table_name} WHERE input_size = ? AND run_mean IS NOT NULL", fixed_input_size).each do |fields|
+    algorithm = fields[0]
+    data_input["#{algorithm}"] ||= []
+    data_input["#{algorithm}"].push(fields[1..])
+  end
+  data_input
+end
+
+def print_tabular(table_name)
+  fixed_state_size = 500
+  fixed_input_size = 50000
+  keys = ["reversed", "bbs-150"]
+  titles = ["%ReverseStream", "%BlockStream"]
+
+  data_state = get_fixed_state_data_from_db(table_name, fixed_state_size)
+  data_input = get_fixed_input_data_from_db(table_name, fixed_input_size)
+
+  sio = StringIO.new
+  sio.puts <<"EOS"
+%begin{tabular}{cc|cc}%toprule
+Algorithm & %begin{tabular}{@{}c@{}}%# of%%Monitored%%Ciphertexts%end{tabular} & %begin{tabular}{@{}c@{}}Average%%Runtime%%(s)%end{tabular} & %begin{tabular}{@{}c@{}}Average%%Memory%%Usage%%(GiB)%end{tabular}%%
+EOS
+  keys.each_with_index do |key, ki|
+    algorithm = titles[ki]
+    sio.puts "%midrule"
+    sio.puts "%multirow{#{data_state[key].size}}{*}{#{algorithm}}"
+    data_state[key].each_with_index do |fields, index|
+      state_size, input_size, run_mean, run_stddev, mem_mean, mem_stddev = fields
+      sio.puts " & #{input_size}000 & #{sprintf("%.2f", run_mean)} & #{sprintf("%.2f", mem_mean)}%%"
+    end
+  end
+  sio.puts <<"EOS"
+%bottomrule
+%end{tabular}
+EOS
+  puts sio.string.gsub("%", "\\")
+  puts
+
+  sio = StringIO.new
+  sio.puts <<"EOS"
+%begin{tabular}{cc|cc}%toprule
+Algorithm & %begin{tabular}{@{}c@{}}%# of%%States%end{tabular} & %begin{tabular}{@{}c@{}}Average%%Runtime%%(s)%end{tabular} & %begin{tabular}{@{}c@{}}Average%%Memory%%Usage%%(GiB)%end{tabular}%%
+EOS
+  keys.each_with_index do |key, ki|
+    algorithm = titles[ki]
+    sio.puts "%midrule"
+    sio.puts "%multirow{#{data_input[key].size}}{*}{#{algorithm}}"
+    data_input[key].each_with_index do |fields, index|
+      state_size, input_size, run_mean, run_stddev, mem_mean, mem_stddev = fields
+      sio.puts " & #{state_size} & #{sprintf("%.2f", run_mean)} & #{sprintf("%.2f", mem_mean)}%%"
+    end
+  end
+  sio.puts <<"EOS"
+%bottomrule
+%end{tabular}
+EOS
+  puts sio.string.gsub("%", "\\")
+  puts
 end
 
 def print_gnuplot(table_name)
@@ -374,19 +490,8 @@ def print_gnuplot(table_name)
   yrange_when_fixed_input = "[0:150]"
   term_tikz_size = "8,5"
 
-  data_state = {}
-  data_input = {}
-  db = open_db
-  db.execute("SELECT algorithm,state_size,input_size/1000,run_mean/1000000.0,run_stddev/1000000.0 FROM #{table_name} WHERE state_size = ? AND run_mean IS NOT NULL", fixed_state_size).each do |fields|
-    algorithm, state_size, input_size, run_mean, run_stddev = fields
-    data_state["#{algorithm}"] ||= []
-    data_state["#{algorithm}"].push([input_size, run_mean, run_stddev])
-  end
-  db.execute("SELECT algorithm,state_size,input_size/1000,run_mean/1000000.0,run_stddev/1000000.0 FROM #{table_name} WHERE input_size = ? AND run_mean IS NOT NULL", fixed_input_size).each do |fields|
-    algorithm, state_size, input_size, run_mean, run_stddev = fields
-    data_input["#{algorithm}"] ||= []
-    data_input["#{algorithm}"].push([state_size, run_mean, run_stddev])
-  end
+  data_state = get_fixed_state_data_from_db(table_name, fixed_state_size)
+  data_input = get_fixed_input_data_from_db(table_name, fixed_input_size)
 
   keys = ["reversed", "bbs-150"]
   titles = ["ReverseStream", "BlockStream"]
@@ -398,7 +503,10 @@ def print_gnuplot(table_name)
 
   points_state = []
   keys.each_with_index do |key, index|
-    values = data_state[key]
+    values = data_state[key].map do |state_size, input_size, run_mean, run_stddev, mem_mean, mem_stddev|
+      [input_size, run_mean, run_stddev]
+    end
+    pp data_state[key]
     #points_state.push([
     #  *values.transpose,
     #  with: :errorbars,
@@ -419,7 +527,9 @@ def print_gnuplot(table_name)
 
   points_input = []
   keys.each_with_index do |key, index|
-    values = data_input[key]
+    values = data_input[key].map do |state_size, input_size, run_mean, run_stddev, mem_mean, mem_stddev|
+      [state_size, run_mean, run_stddev]
+    end
     #points_input.push([
     #  *values.transpose,
     #  with: :errorbars,
@@ -439,11 +549,15 @@ def print_gnuplot(table_name)
   end
 
   Numo.gnuplot do
-    set :term, :lua, :tikz
-    set :output, "#{table_name}-fixed-state.tex"
-    set :term, :tikz, :size, term_tikz_size
-    #set :terminal, :pdf, :font, "Helvetica,20"
-    #set :output, "#{table_name}-fixed-state.pdf"
+    case $export_type
+    when :tex
+      set :term, :lua, :tikz
+      set :output, "#{table_name}-fixed-state.tex"
+      set :term, :tikz, :size, term_tikz_size
+    when :pdf
+      set :terminal, :pdf, :font, "Helvetica,20"
+      set :output, "#{table_name}-fixed-state.pdf"
+    end
     set :monochrom
     set :key, :left, :top
     set :key, :Left
@@ -456,11 +570,15 @@ def print_gnuplot(table_name)
   end
 
   Numo.gnuplot do
-    set :term, :lua, :tikz
-    set :output, "#{table_name}-fixed-input.tex"
-    set :term, :tikz, :size, term_tikz_size
-    #set :terminal, :pdf, :font, "Helvetica,20"
-    #set :output, "#{table_name}-fixed-input.pdf"
+    case $export_type
+    when :tex
+      set :term, :lua, :tikz
+      set :output, "#{table_name}-fixed-input.tex"
+      set :term, :tikz, :size, term_tikz_size
+    when :pdf
+      set :terminal, :pdf, :font, "Helvetica,20"
+      set :output, "#{table_name}-fixed-input.pdf"
+    end
     set :monochrom
     set :key, :left, :top
     set :key, :Left
@@ -482,6 +600,8 @@ when "import"
 when "plot"
   print_usage_and_exit unless ARGV.size == 2
   print_gnuplot(ARGV[1])
+when "tabular"
+  print_tabular(ARGV[1])
 else
   print_usage_and_exit
 end
