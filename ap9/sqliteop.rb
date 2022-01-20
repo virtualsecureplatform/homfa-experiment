@@ -34,30 +34,57 @@ end
 
 def import_result(table_name, result_dir)
   logfile_names = [
-    "bbs_damon-001.spec_adult-001-7days-bg.in_45.log",
-    "bbs_damon-004.spec_adult-001-7days-bg.in_45.log",
-    "bbs_damon-005.spec_adult-001-7days-bg.in_45.log",
-    "bbs_towards-001.spec_adult-001-night-bg.in_45.log",
-    "bbs_towards-002.spec_adult-001-night-bg.in_45.log",
-    "bbs_towards-004.spec_adult-001-night-bg.in_45.log",
+    # output interval = 9
+    "bbs_damon-001.spec_adult-001-7days-bg.in_9.log",
+    "bbs_damon-004.spec_adult-001-7days-bg.in_9.log",
+    "bbs_damon-005.spec_adult-001-7days-bg.in_9.log",
+    "bbs_towards-001.spec_adult-001-night-bg.in_9.log",
+    "bbs_towards-002.spec_adult-001-night-bg.in_9.log",
+    "bbs_towards-004.spec_adult-001-night-bg.in_9.log",
     "offline_damon-001.spec_adult-001-7days-bg.in_0.log",
     "offline_damon-004.spec_adult-001-7days-bg.in_0.log",
     "offline_damon-005.spec_adult-001-7days-bg.in_0.log",
     "offline_towards-001.spec_adult-001-night-bg.in_0.log",
     "offline_towards-002.spec_adult-001-night-bg.in_0.log",
     "offline_towards-004.spec_adult-001-night-bg.in_0.log",
-    "plain_damon-001.spec_adult-001-7days-bg.in_45.log",
-    "plain_damon-004.spec_adult-001-7days-bg.in_45.log",
-    "plain_damon-005.spec_adult-001-7days-bg.in_45.log",
-    "plain_towards-001.spec_adult-001-night-bg.in_45.log",
-    "plain_towards-002.spec_adult-001-night-bg.in_45.log",
-    "plain_towards-004.spec_adult-001-night-bg.in_45.log",
-    "reversed_damon-001-rev.spec_adult-001-7days-bg.in_45.log",
-    "reversed_damon-004-rev.spec_adult-001-7days-bg.in_45.log",
-    "reversed_damon-005-rev.spec_adult-001-7days-bg.in_45.log",
-    "reversed_towards-001-rev.spec_adult-001-night-bg.in_45.log",
-    "reversed_towards-002-rev.spec_adult-001-night-bg.in_45.log",
-    "reversed_towards-004-rev.spec_adult-001-night-bg.in_45.log",
+    "plain_damon-001.spec_adult-001-7days-bg.in_9.log",
+    "plain_damon-004.spec_adult-001-7days-bg.in_9.log",
+    "plain_damon-005.spec_adult-001-7days-bg.in_9.log",
+    "plain_towards-001.spec_adult-001-night-bg.in_9.log",
+    "plain_towards-002.spec_adult-001-night-bg.in_9.log",
+    "plain_towards-004.spec_adult-001-night-bg.in_9.log",
+    "reversed_damon-001-rev.spec_adult-001-7days-bg.in_9.log",
+    "reversed_damon-004-rev.spec_adult-001-7days-bg.in_9.log",
+    "reversed_damon-005-rev.spec_adult-001-7days-bg.in_9.log",
+    "reversed_towards-001-rev.spec_adult-001-night-bg.in_9.log",
+    "reversed_towards-002-rev.spec_adult-001-night-bg.in_9.log",
+    "reversed_towards-004-rev.spec_adult-001-night-bg.in_9.log",
+
+  # output interval = 45
+  #"bbs_damon-001.spec_adult-001-7days-bg.in_45.log",
+  #"bbs_damon-004.spec_adult-001-7days-bg.in_45.log",
+  #"bbs_damon-005.spec_adult-001-7days-bg.in_45.log",
+  #"bbs_towards-001.spec_adult-001-night-bg.in_45.log",
+  #"bbs_towards-002.spec_adult-001-night-bg.in_45.log",
+  #"bbs_towards-004.spec_adult-001-night-bg.in_45.log",
+  #"offline_damon-001.spec_adult-001-7days-bg.in_0.log",
+  #"offline_damon-004.spec_adult-001-7days-bg.in_0.log",
+  #"offline_damon-005.spec_adult-001-7days-bg.in_0.log",
+  #"offline_towards-001.spec_adult-001-night-bg.in_0.log",
+  #"offline_towards-002.spec_adult-001-night-bg.in_0.log",
+  #"offline_towards-004.spec_adult-001-night-bg.in_0.log",
+  #"plain_damon-001.spec_adult-001-7days-bg.in_45.log",
+  #"plain_damon-004.spec_adult-001-7days-bg.in_45.log",
+  #"plain_damon-005.spec_adult-001-7days-bg.in_45.log",
+  #"plain_towards-001.spec_adult-001-night-bg.in_45.log",
+  #"plain_towards-002.spec_adult-001-night-bg.in_45.log",
+  #"plain_towards-004.spec_adult-001-night-bg.in_45.log",
+  #"reversed_damon-001-rev.spec_adult-001-7days-bg.in_45.log",
+  #"reversed_damon-004-rev.spec_adult-001-7days-bg.in_45.log",
+  #"reversed_damon-005-rev.spec_adult-001-7days-bg.in_45.log",
+  #"reversed_towards-001-rev.spec_adult-001-night-bg.in_45.log",
+  #"reversed_towards-002-rev.spec_adult-001-night-bg.in_45.log",
+  #"reversed_towards-004-rev.spec_adult-001-night-bg.in_45.log",
   ]
 
   data2 = logfile_names.map { |filename|
@@ -219,8 +246,12 @@ def export_latex_tabular(table_name)
       when "adult-001-night-bg.in"
         721
       end
-    data[run_key] = sprintf("%.2f\\pm%.2f", run_mean_s, run_stddev_s)
-    data[run_per_input_key] = sprintf("%.2f\\pm%.2f", run_mean_ms / input_size, run_stddev_ms / input_size)
+    ## With stderr
+    #data[run_key] = sprintf("%.2f\\pm%.2f", run_mean_s, run_stddev_s)
+    #data[run_per_input_key] = sprintf("%.2f\\pm%.2f", run_mean_ms / input_size, run_stddev_ms / input_size)
+    # Without stderr
+    data[run_key] = sprintf("%.2f", run_mean_s)
+    data[run_per_input_key] = sprintf("%.2f", run_mean_ms / input_size)
   end
   #data["rev_psi1_r"] |= "\\text{---}"
   #data["rev_psi2_r"] |= "\\text{---}"
@@ -231,15 +262,16 @@ def export_latex_tabular(table_name)
 
   d = OpenStruct.new(data)
   puts <<"EOS".gsub("%", "\\")
+
 %begin{tabular}{ccccc|r|r}%toprule
-formula                   & %#states              & %#rev states                 & %#inputs               & algorithm          & time (s)                   & time (ms/input)   %%%midrule
+Formula & %begin{tabular}{@{}c@{}}Monitoring%%DFA size%end{tabular} & %begin{tabular}{@{}c@{}}Reversed%%Monitoring%%DFA size%end{tabular} & %begin{tabular}{@{}c@{}}%# of blood%%glucose%%values%end{tabular} & Algorithm & %begin{tabular}{@{}c@{}}Runtime%%(s)%end{tabular} & %begin{tabular}{@{}c@{}}Average%%Runtime%%(ms/value)%end{tabular}   %%%midrule
 
 %multirow{2}{*}{$%psi_1$} & %multirow{2}{*}{10524} & %multirow{2}{*}{2712974}    & %multirow{2}{*}{721}   & %ReverseStream    & $#{d.rev_psi1_r}$          & $#{d.rev_psi1_rpi}$ %%
                           &                        &                             &                        & %BlockStream      & $%mathbf{#{d.bbs_psi1_r}}$ & $%mathbf{#{d.bbs_psi1_rpi}}$ %%%hline
 %multirow{2}{*}{$%psi_2$} & %multirow{2}{*}{11126} & %multirow{2}{*}{2885376}    & %multirow{2}{*}{721}   & %ReverseStream    & $#{d.rev_psi2_r}$          & $#{d.rev_psi2_rpi}$ %%
                           &                        &                             &                        & %BlockStream      & $%mathbf{#{d.bbs_psi2_r}}$ & $%mathbf{#{d.bbs_psi2_rpi}}$ %%%hline
-%multirow{2}{*}{$%psi_4$} & %multirow{2}{*}{7026}  & %multirow{2}{*}{---}        & %multirow{2}{*}{721}   & %ReverseStream    & $#{d.rev_psi4_r}$          & $#{d.rev_psi4_rpi}$ %%
-                          &                        &                             &                        & %BlockStream      & $%mathbf{#{d.bbs_psi4_r}}$ & $%mathbf{#{d.bbs_psi4_rpi}}$ %%%midrule%midrule
+%multirow{2}{*}{$%psi_4$} & %multirow{2}{*}{7026}  & %multirow{2}{*}{---}        & %multirow{2}{*}{721}   & %ReverseStream    & ---                        & $#{d.rev_psi4_rpi}$ %%
+                          &                        &                             &                        & %BlockStream      & ---                        & $%mathbf{#{d.bbs_psi4_rpi}}$ %%%midrule%midrule
 
 %multirow{2}{*}{$%phi_1$} & %multirow{2}{*}{21}    & %multirow{2}{*}{20}         & %multirow{2}{*}{10081} & %ReverseStream    & $%mathbf{#{d.rev_phi1_r}}$ & $%mathbf{#{d.rev_phi1_rpi}}$ %%
                           &                        &                             &                        & %BlockStream      & $#{d.bbs_phi1_r}$          & $#{d.bbs_phi1_rpi}$ %%%hline
