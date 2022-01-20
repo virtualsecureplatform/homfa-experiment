@@ -403,8 +403,18 @@ SQL
   db = open_db
   db.execute(sql, *v).each do |fields|
     algorithm = fields[0]
+    h =
+      [
+        :algorithm,
+        :state_size,
+        :input_size,
+        :run_mean,
+        :run_stddev,
+        :mem_mean,
+        :mem_stddev,
+      ].zip(fields).to_h
     data[algorithm] ||= []
-    data[algorithm].push(fields[1..])
+    data[algorithm].push(h)
   end
   data
 end
@@ -420,7 +430,7 @@ end
 def print_tabular(table_name)
   fixed_state_size = 500
   fixed_input_size = 50000
-  keys = ["reversed", "bbs-150"]
+  algorithm_keys = ["reversed", "bbs-150"]
   titles = ["%ReverseStream", "%BlockStream"]
   data_src = {
     state_fixed: get_fixed_state_data_from_db(table_name, fixed_state_size),
@@ -430,10 +440,15 @@ def print_tabular(table_name)
     state_fixed: "%begin{tabular}{@{}c@{}}%# of%%Monitored%%Ciphertexts%end{tabular}",
     input_fixed: "%begin{tabular}{@{}c@{}}%# of%%States%end{tabular}",
   }
+  first_column_value_key_src = {
+    state_fixed: :input_size,
+    input_fixed: :state_size,
+  }
 
   [:state_fixed, :input_fixed].each do |kind|
     data = data_src[kind]
     first_column_name = first_column_name_src[kind]
+    first_column_value_key = first_column_value_key_src[kind]
 
     sio = StringIO.new
     ### Table header
@@ -442,19 +457,13 @@ def print_tabular(table_name)
 Algorithm & #{first_column_name} & %begin{tabular}{@{}c@{}}Average%%Runtime%%(s)%end{tabular} & %begin{tabular}{@{}c@{}}Average%%Memory%%Usage%%(GiB)%end{tabular}%%
 EOS
     ### Table body
-    keys.each_with_index do |key, ki|
+    algorithm_keys.each_with_index do |algorithm_key, ki|
       algorithm = titles[ki]
       sio.puts "%midrule"
-      sio.puts "%multirow{#{data[key].size}}{*}{#{algorithm}}"
-      data[key].each_with_index do |fields, index|
-        state_size, input_size, run_mean, run_stddev, mem_mean, mem_stddev = fields
-        first_column_value = case kind
-          when :state_fixed
-            input_size
-          when :input_fixed
-            state_size
-          end
-        sio.puts " & #{first_column_value}000 & #{sprintf("%.2f", run_mean)} & #{sprintf("%.2f", mem_mean)}%%"
+      sio.puts "%multirow{#{data[algorithm_key].size}}{*}{#{algorithm}}"
+      data[algorithm_key].each_with_index do |f, index|
+        first_column_value = f[first_column_value_key]
+        sio.puts " & #{first_column_value}000 & #{sprintf("%.2f", f[:run_mean])} & #{sprintf("%.2f", f[:mem_mean])}%%"
       end
     end
     ### Table footer
@@ -483,9 +492,9 @@ def print_gnuplot(table_name)
     state_fixed: get_fixed_state_data_from_db(table_name, fixed_state_size),
     input_fixed: get_fixed_input_data_from_db(table_name, fixed_input_size),
   }
-  state_input_src = {
-    state_fixed: 1,
-    input_fixed: 0,
+  size_key_src = {
+    state_fixed: :input_size,
+    input_fixed: :state_size,
   }
   output_filename_src = {
     state_fixed: "#{table_name}-fixed-state",
@@ -502,15 +511,15 @@ def print_gnuplot(table_name)
 
   [:state_fixed, :input_fixed].each do |kind|
     data = data_src[kind]
+    size_key = size_key_src[kind]
     output_filename = output_filename_src[kind]
     xlabel, ylabel = xylabel_src[kind]
     xrange, yrange = xyrange_src[kind]
 
     points = []
     keys.each_with_index do |key, index|
-      values = data[key].map do |state_size, input_size, run_mean, run_stddev, mem_mean, mem_stddev|
-        size = [state_size, input_size][state_input_src[kind]]
-        [size, run_mean, run_stddev]
+      values = data[key].map do |f|
+        [f[size_key], f[:run_mean], f[:run_stddev]]
       end
       #points.push([
       #  *values.transpose,
