@@ -4,8 +4,8 @@ require "sqlite3"
 require "numo/gnuplot"
 require "stringio"
 
-$export_type = :pdf
-#$export_type = :tex
+#$export_type = :pdf
+$export_type = :tex
 
 module Enumerable
   def sum
@@ -38,6 +38,14 @@ end
 def to_memlogfile(filename)
   raise "invalid filename" unless filename =~ /^(.+)\.log$/
   "#{$1}_mem.log"
+end
+
+def format_float(val)
+  if val.nil?
+    "---"
+  else
+    sprintf("%.2f", val)
+  end
 end
 
 def import_result(table_name, result_dir)
@@ -394,7 +402,17 @@ end
 
 def select_from_db(table_name, w: "TRUE", v: [])
   sql = <<"SQL"
-SELECT algorithm,state_size,input_size/1000,run_mean/1000000.0,run_stddev/1000000.0,mem_mean/1024.0/1024.0,mem_stddev/1024.0/1024.0
+SELECT
+  algorithm,
+  state_size,
+  input_size/1000,
+  run_mean/1000000.0,
+  run_stddev/1000000.0,
+  mem_mean/1024.0/1024.0,
+  mem_stddev/1024.0/1024.0,
+  cmux_sum_mean/1000000.0,
+  bs_sum_mean/1000000.0,
+  cb_sum_mean/1000000.0
 FROM #{table_name}
 WHERE #{w}
 AND run_mean IS NOT NULL
@@ -412,6 +430,9 @@ SQL
         :run_stddev,
         :mem_mean,
         :mem_stddev,
+        :cmux_sum_mean,
+        :bs_sum_mean,
+        :cb_sum_mean,
       ].zip(fields).to_h
     data[algorithm] ||= []
     data[algorithm].push(h)
@@ -453,8 +474,18 @@ def print_tabular(table_name)
     sio = StringIO.new
     ### Table header
     sio.puts <<"EOS"
-%begin{tabular}{cc|cc}%toprule
-Algorithm & #{first_column_name} & %begin{tabular}{@{}c@{}}Average%%Runtime%%(s)%end{tabular} & %begin{tabular}{@{}c@{}}Average%%Memory%%Usage%%(GiB)%end{tabular}%%
+%begin{tabular}{c|c||c|c|c||c|c}%toprule
+%multirow{3}{*}{Algorithm} &
+%multirow{3}{*}{#{first_column_name}} &
+%multicolumn{4}{c|}{Runtime (s)} &
+%multirow{3}{*}{%begin{tabular}[c]{@{}c@{}}Memoery%% Usage%% (GiB)%end{tabular}} %% %cline{3-6}
+&
+&
+%multirow{2}{*}{%CMux{}} &
+%multirow{2}{*}{%Bootstrapping{}} &
+%multirow{2}{*}{%CircuitBootstrapping{}} &
+%multirow{2}{*}{Total} & %%
+&&&&&&%%
 EOS
     ### Table body
     algorithm_keys.each_with_index do |algorithm_key, ki|
@@ -462,8 +493,21 @@ EOS
       sio.puts "%midrule"
       sio.puts "%multirow{#{data[algorithm_key].size}}{*}{#{algorithm}}"
       data[algorithm_key].each_with_index do |f, index|
-        first_column_value = f[first_column_value_key]
-        sio.puts " & #{first_column_value}000 & #{sprintf("%.2f", f[:run_mean])} & #{sprintf("%.2f", f[:mem_mean])}%%"
+        first_column_value = case kind
+          when :state_fixed
+            "#{f[:input_size]}000"
+          when :input_fixed
+            "#{f[:state_size]}"
+          end
+        sio.puts [
+          "",
+          first_column_value,
+          "#{format_float(f[:cmux_sum_mean])}",
+          "#{format_float(f[:bs_sum_mean])}",
+          "#{format_float(f[:cb_sum_mean])}",
+          "#{format_float(f[:run_mean])}",
+          "#{format_float(f[:mem_mean])}%%",
+        ].join(" & ")
       end
     end
     ### Table footer
@@ -479,7 +523,7 @@ end
 def print_gnuplot(table_name)
   fixed_state_size = 500
   fixed_input_size = 50000
-  term_tikz_size = "8,5"
+  term_tikz_size = "6,3.1"
 
   keys = ["reversed", "bbs-150"]
   titles = ["ReverseStream", "BlockStream"]
@@ -501,12 +545,12 @@ def print_gnuplot(table_name)
     input_fixed: "#{table_name}-fixed-input",
   }
   xylabel_src = {
-    state_fixed: ["Number of Monitored Ciphertexts ($\\times 10^3$)", "time (sec)"],
-    input_fixed: ["Number of States (states)", "time (sec)"],
+    state_fixed: ["\\# of Monitored Ciphertexts ($\\times 10^3$)", "time (sec)"],
+    input_fixed: ["\\# of States (states)", "time (sec)"],
   }
   xyrange_src = {
-    state_fixed: ["[5:55]", "[0:150]"],
-    input_fixed: ["[0:510]", "[0:150]"],
+    state_fixed: ["[5:56]", "[0:200]"],
+    input_fixed: ["[0:510]", "[0:200]"],
   }
 
   [:state_fixed, :input_fixed].each do |kind|
