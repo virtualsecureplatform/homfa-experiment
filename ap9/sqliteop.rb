@@ -282,12 +282,12 @@ SQL
       when "adult-001-night-bg.in"
         721
       end
-    runtime = format_float(run_mean&./(1000000))
-    average_runtime = format_float(run_mean&./(input_size * 1000))
-    memory_usage = format_float(mem_mean&./(1024 * 1024))
-    cmux_runtime = format_float(cmux_sum_mean&./(1000000))
-    bs_runtime = format_float(bs_sum_mean&./(1000000))
-    cb_runtime = format_float(cb_sum_mean&./(1000000))
+    runtime = format_float(run_mean&./(1000000.0))
+    average_runtime = format_float(run_mean&./(input_size * 1000.0))
+    memory_usage = format_float(mem_mean&./(1024.0 * 1024.0))
+    cmux_runtime = format_float(cmux_sum_mean&./(1000000.0))
+    bs_runtime = format_float(bs_sum_mean&./(1000000.0))
+    cb_runtime = format_float(cb_sum_mean&./(1000000.0))
 
     key = "#{alg}_#{fml}"
     data[key] = [cmux_runtime, bs_runtime, cb_runtime, runtime, average_runtime, memory_usage].join(" & ")
@@ -297,8 +297,8 @@ SQL
   puts <<"EOS".gsub("%", "\\")
 %begin{tabular}{ccccc||c|c|c||c|c|c}%toprule
 %multirow{3}{*}{Formula} &
-%multirow{3}{*}{%begin{tabular}[c]{@{}c@{}}Monitoring%% DFA size%end{tabular}} &
-%multirow{3}{*}{%begin{tabular}[c]{@{}c@{}}Reversed%% Monitoring%% DFA size%end{tabular}} &
+%multirow{3}{*}{%begin{tabular}[c]{@{}c@{}}$|Q|$%end{tabular}} &
+%multirow{3}{*}{%begin{tabular}[c]{@{}c@{}}$|%Rev{Q}|$%end{tabular}} &
 %multirow{3}{*}{%begin{tabular}[c]{@{}c@{}}%# of blood%% glucose%% values%end{tabular}} &
 %multirow{3}{*}{Algorithm} &
 %multicolumn{4}{c|}{Runtime (s)}&
@@ -307,7 +307,7 @@ SQL
 &&&&&
 %multicolumn{1}{c|}{%multirow{2}{*}{%CMux{}}} &
 %multicolumn{1}{c|}{%multirow{2}{*}{%Bootstrapping{}}} &
-%multicolumn{1}{c||}{%multirow{2}{*}{%CircuitBootstrapping{}}} &
+%multicolumn{1}{c||}{%multirow{2}{*}{%begin{tabular}{@{}c@{}}%textsc{Circuit}%%%textsc{Bootstrapping}%end{tabular}}} &
 %multirow{2}{*}{Total} &
 &%%
 &&&&&
@@ -381,36 +381,37 @@ def export_latex_tabular(table_name)
 
 %begin{tabular}{ccccc|r|r}%toprule
 Formula & %begin{tabular}{@{}c@{}}Monitoring%%DFA size%end{tabular} & %begin{tabular}{@{}c@{}}Reversed%%Monitoring%%DFA size%end{tabular} & %begin{tabular}{@{}c@{}}%# of blood%%glucose%%values%end{tabular} & Algorithm & %begin{tabular}{@{}c@{}}Runtime%%(s)%end{tabular} & %begin{tabular}{@{}c@{}}Average%%Runtime%%(ms/value)%end{tabular}   %%%midrule
+%multirow{2}{*}{$%psi_1$} & %multirow{2}{*}{10524} & %multirow{2}{*}{2712974}    & %multirow{2}{*}{721}   & %ReverseStream    & $#{d.rev_psi1_r}$ & $#{d.rev_psi1_rpi}$ %%
+                          &                        &                             &                        & %BlockStream      & $#{d.bbs_psi1_r}$ & $#{d.bbs_psi1_rpi}$ %%%midrule
+%multirow{2}{*}{$%psi_2$} & %multirow{2}{*}{11126} & %multirow{2}{*}{2885376}    & %multirow{2}{*}{721}   & %ReverseStream    & $#{d.rev_psi2_r}$ & $#{d.rev_psi2_rpi}$ %%
+                          &                        &                             &                        & %BlockStream      & $#{d.bbs_psi2_r}$ & $#{d.bbs_psi2_rpi}$ %%%midrule
+%multirow{2}{*}{$%psi_4$} & %multirow{2}{*}{7026}  & %multirow{2}{*}{---}        & %multirow{2}{*}{721}   & %ReverseStream    & ---               & ---                 %%
+                          &                        &                             &                        & %BlockStream      & $#{d.bbs_psi4_r}$ & $#{d.bbs_psi4_rpi}$ %%%midrule%midrule
 
-%multirow{2}{*}{$%psi_1$} & %multirow{2}{*}{10524} & %multirow{2}{*}{2712974}    & %multirow{2}{*}{721}   & %ReverseStream    & $#{d.rev_psi1_r}$          & $#{d.rev_psi1_rpi}$ %%
-                          &                        &                             &                        & %BlockStream      & $%mathbf{#{d.bbs_psi1_r}}$ & $%mathbf{#{d.bbs_psi1_rpi}}$ %%%midrule
-%multirow{2}{*}{$%psi_2$} & %multirow{2}{*}{11126} & %multirow{2}{*}{2885376}    & %multirow{2}{*}{721}   & %ReverseStream    & $#{d.rev_psi2_r}$          & $#{d.rev_psi2_rpi}$ %%
-                          &                        &                             &                        & %BlockStream      & $%mathbf{#{d.bbs_psi2_r}}$ & $%mathbf{#{d.bbs_psi2_rpi}}$ %%%midrule
-%multirow{2}{*}{$%psi_4$} & %multirow{2}{*}{7026}  & %multirow{2}{*}{---}        & %multirow{2}{*}{721}   & %ReverseStream    & ---                        & ---                          %%
-                          &                        &                             &                        & %BlockStream      & $%mathbf{#{d.bbs_psi4_r}}$ & $%mathbf{#{d.bbs_psi4_rpi}}$ %%%midrule%midrule
-
-%multirow{2}{*}{$%phi_1$} & %multirow{2}{*}{21}    & %multirow{2}{*}{20}         & %multirow{2}{*}{10081} & %ReverseStream    & $%mathbf{#{d.rev_phi1_r}}$ & $%mathbf{#{d.rev_phi1_rpi}}$ %%
-                          &                        &                             &                        & %BlockStream      & $#{d.bbs_phi1_r}$          & $#{d.bbs_phi1_rpi}$ %%%midrule
-%multirow{2}{*}{$%phi_4$} & %multirow{2}{*}{237}   & %multirow{2}{*}{237}        & %multirow{2}{*}{10081} & %ReverseStream    & $%mathbf{#{d.rev_phi4_r}}$ & $%mathbf{#{d.rev_phi4_rpi}}$ %%
-                          &                        &                             &                        & %BlockStream      & $#{d.bbs_phi4_r}$          & $#{d.bbs_phi4_rpi}$ %%%midrule
-%multirow{2}{*}{$%phi_5$} & %multirow{2}{*}{390}   & %multirow{2}{*}{390}        & %multirow{2}{*}{10081} & %ReverseStream    & $%mathbf{#{d.rev_phi5_r}}$ & $%mathbf{#{d.rev_phi5_rpi}}$ %%
-                          &                        &                             &                        & %BlockStream      & $#{d.bbs_phi5_r}$          & $#{d.bbs_phi5_rpi}$ %%%bottomrule
+%multirow{2}{*}{$%phi_1$} & %multirow{2}{*}{21}    & %multirow{2}{*}{20}         & %multirow{2}{*}{10081} & %ReverseStream    & $#{d.rev_phi1_r}$ & $#{d.rev_phi1_rpi}$ %%
+                          &                        &                             &                        & %BlockStream      & $#{d.bbs_phi1_r}$ & $#{d.bbs_phi1_rpi}$ %%%midrule
+%multirow{2}{*}{$%phi_4$} & %multirow{2}{*}{237}   & %multirow{2}{*}{237}        & %multirow{2}{*}{10081} & %ReverseStream    & $#{d.rev_phi4_r}$ & $#{d.rev_phi4_rpi}$ %%
+                          &                        &                             &                        & %BlockStream      & $#{d.bbs_phi4_r}$ & $#{d.bbs_phi4_rpi}$ %%%midrule
+%multirow{2}{*}{$%phi_5$} & %multirow{2}{*}{390}   & %multirow{2}{*}{390}        & %multirow{2}{*}{10081} & %ReverseStream    & $#{d.rev_phi5_r}$ & $#{d.rev_phi5_rpi}$ %%
+                          &                        &                             &                        & %BlockStream      & $#{d.bbs_phi5_r}$ & $#{d.bbs_phi5_rpi}$ %%%bottomrule
 %end{tabular}
 EOS
 
-  #%multirow{2}{*}{$%psi_1$} & %multirow{2}{*}{10524} & %multirow{2}{*}{2712974}    & %multirow{2}{*}{721}   & %ReverseStream    & $#{d.rev_psi1_r}$ & $#{d.rev_psi1_rpi}$ %%
-  #                          &                        &                             &                        & %BlockStream      & $#{d.bbs_psi1_r}$ & $#{d.bbs_psi1_rpi}$ %%%midrule
-  #%multirow{2}{*}{$%psi_2$} & %multirow{2}{*}{11126} & %multirow{2}{*}{2885376}    & %multirow{2}{*}{721}   & %ReverseStream    & $#{d.rev_psi2_r}$ & $#{d.rev_psi2_rpi}$ %%
-  #                          &                        &                             &                        & %BlockStream      & $#{d.bbs_psi2_r}$ & $#{d.bbs_psi2_rpi}$ %%%midrule
-  #%multirow{2}{*}{$%psi_4$} & %multirow{2}{*}{7026}  & %multirow{2}{*}{---}        & %multirow{2}{*}{721}   & %ReverseStream    & ---               & $#{d.rev_psi4_rpi}$ %%
-  #                          &                        &                             &                        & %BlockStream      & ---               & $#{d.bbs_psi4_rpi}$ %%%midrule%midrule
   #
-  #%multirow{2}{*}{$%phi_1$} & %multirow{2}{*}{21}    & %multirow{2}{*}{20}         & %multirow{2}{*}{10081} & %ReverseStream    & $#{d.rev_phi1_r}$ & $#{d.rev_phi1_rpi}$ %%
-  #                          &                        &                             &                        & %BlockStream      & $#{d.bbs_phi1_r}$ & $#{d.bbs_phi1_rpi}$ %%%midrule
-  #%multirow{2}{*}{$%phi_4$} & %multirow{2}{*}{237}   & %multirow{2}{*}{237}        & %multirow{2}{*}{10081} & %ReverseStream    & $#{d.rev_phi4_r}$ & $#{d.rev_phi4_rpi}$ %%
-  #                          &                        &                             &                        & %BlockStream      & $#{d.bbs_phi4_r}$ & $#{d.bbs_phi4_rpi}$ %%%midrule
-  #%multirow{2}{*}{$%phi_5$} & %multirow{2}{*}{390}   & %multirow{2}{*}{390}        & %multirow{2}{*}{10081} & %ReverseStream    & $#{d.rev_phi5_r}$ & $#{d.rev_phi5_rpi}$ %%
-  #                          &                        &                             &                        & %BlockStream      & $#{d.bbs_phi5_r}$ & $#{d.bbs_phi5_rpi}$ %%
+  #%multirow{2}{*}{$%psi_1$} & %multirow{2}{*}{10524} & %multirow{2}{*}{2712974}    & %multirow{2}{*}{721}   & %ReverseStream    & $#{d.rev_psi1_r}$          & $#{d.rev_psi1_rpi}$ %%
+  #                          &                        &                             &                        & %BlockStream      & $%mathbf{#{d.bbs_psi1_r}}$ & $%mathbf{#{d.bbs_psi1_rpi}}$ %%%midrule
+  #%multirow{2}{*}{$%psi_2$} & %multirow{2}{*}{11126} & %multirow{2}{*}{2885376}    & %multirow{2}{*}{721}   & %ReverseStream    & $#{d.rev_psi2_r}$          & $#{d.rev_psi2_rpi}$ %%
+  #                          &                        &                             &                        & %BlockStream      & $%mathbf{#{d.bbs_psi2_r}}$ & $%mathbf{#{d.bbs_psi2_rpi}}$ %%%midrule
+  #%multirow{2}{*}{$%psi_4$} & %multirow{2}{*}{7026}  & %multirow{2}{*}{---}        & %multirow{2}{*}{721}   & %ReverseStream    & ---                        & ---                          %%
+  #                          &                        &                             &                        & %BlockStream      & $%mathbf{#{d.bbs_psi4_r}}$ & $%mathbf{#{d.bbs_psi4_rpi}}$ %%%midrule%midrule
+  #
+  #%multirow{2}{*}{$%phi_1$} & %multirow{2}{*}{21}    & %multirow{2}{*}{20}         & %multirow{2}{*}{10081} & %ReverseStream    & $%mathbf{#{d.rev_phi1_r}}$ & $%mathbf{#{d.rev_phi1_rpi}}$ %%
+  #                          &                        &                             &                        & %BlockStream      & $#{d.bbs_phi1_r}$          & $#{d.bbs_phi1_rpi}$ %%%midrule
+  #%multirow{2}{*}{$%phi_4$} & %multirow{2}{*}{237}   & %multirow{2}{*}{237}        & %multirow{2}{*}{10081} & %ReverseStream    & $%mathbf{#{d.rev_phi4_r}}$ & $%mathbf{#{d.rev_phi4_rpi}}$ %%
+  #                          &                        &                             &                        & %BlockStream      & $#{d.bbs_phi4_r}$          & $#{d.bbs_phi4_rpi}$ %%%midrule
+  #%multirow{2}{*}{$%phi_5$} & %multirow{2}{*}{390}   & %multirow{2}{*}{390}        & %multirow{2}{*}{10081} & %ReverseStream    & $%mathbf{#{d.rev_phi5_r}}$ & $%mathbf{#{d.rev_phi5_rpi}}$ %%
+  #                          &                        &                             &                        & %BlockStream      & $#{d.bbs_phi5_r}$          & $#{d.bbs_phi5_rpi}$ %%%bottomrule
+  #
 
 end
 
