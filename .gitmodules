@@ -1,0 +1,3 @@
+[submodule "trgsw-enc-dec/TFHEpp"]
+	path = trgsw-enc-dec/TFHEpp
+	url = https://github.com/virtualsecureplatform/TFHEpp.git
