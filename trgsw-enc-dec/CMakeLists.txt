@@ -9,7 +9,10 @@ project(trgsw-enc-dec LANGUAGES CXX)
 find_package(Threads REQUIRED)
 find_package(OpenMP REQUIRED)
 
+set(USE_FFTW3 ON)
+set(USE_RANDEN OFF)
 add_subdirectory(TFHEpp)
+
 set(CMAKE_C_FLAGS "")
 set(CMAKE_C_FLAGS_DEBUG "")
 set(CMAKE_C_FLAGS_RELEASE "")
