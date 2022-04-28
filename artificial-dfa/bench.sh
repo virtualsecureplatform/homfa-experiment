@@ -87,11 +87,22 @@ seq 30000 | while read line; do echo -n 1; done | ruby ../01tobin.rb 1 > in/size
 seq 40000 | while read line; do echo -n 1; done | ruby ../01tobin.rb 1 > in/size-40000bit.in
 seq 50000 | while read line; do echo -n 1; done | ruby ../01tobin.rb 1 > in/size-50000bit.in
 
+fixed_num_inputs=(50000)
+fixed_num_states=(0500)
 num_states=(0010 0050 0100 0200 0300 0400 0500)
 num_inputs=(10000 20000 30000 40000 50000)
 
-for num_state in "${num_states[@]}"; do
+for num_state in "${fixed_num_states[@]}"; do
     for num_input in "${num_inputs[@]}"; do
+        run_benchmark plain    "size-${num_state}" "size-${num_input}bit"
+        run_benchmark offline  "size-${num_state}" "size-${num_input}bit"
+        run_benchmark reversed "size-${num_state}" "size-${num_input}bit"
+        run_benchmark bbs-150  "size-${num_state}" "size-${num_input}bit"
+    done
+done
+
+for num_state in "${num_states[@]}"; do
+    for num_input in "${fixed_num_inputs[@]}"; do
         run_benchmark plain    "size-${num_state}" "size-${num_input}bit"
         run_benchmark offline  "size-${num_state}" "size-${num_input}bit"
         run_benchmark reversed "size-${num_state}" "size-${num_input}bit"
