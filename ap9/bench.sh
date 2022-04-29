@@ -1,9 +1,4 @@
-#!/usr/bin/bash -eux
-
-BUILD_BIN=${BUILD_BIN:-"build/bin"}
-BENCHMARK=$BUILD_BIN/benchmark
-OUTDIR=$(date +'log-%Y%m%d%H%M%S')
-BOOTSTRAPPING_FREQ=30000
+#!/usr/bin/bash -eu
 
 failwith(){
     echo -ne "\e[1;31m[ERROR]\e[0m "
@@ -11,7 +6,17 @@ failwith(){
     exit 1
 }
 
+[ $# -eq 1 ] || failwith "Specify output directory"
+OUTDIR=$1
+
+BUILD_BIN=${BUILD_BIN:-"build/bin"}
+BENCHMARK=$BUILD_BIN/benchmark
+BOOTSTRAPPING_FREQ=30000
+
 run_benchmark(){
+    # Debug print
+    echo -e "[$(date +'%Y-%m-%d %H:%M:%S')] Running benchmark: $@"
+
     local mode=$1
     local ap_size=$2
     local spec_filepath=$3
@@ -68,6 +73,8 @@ run_benchmark(){
             failwith "Invalid run $1"
             ;;
     esac
+
+    echo -e "\t=> done."
 }
 
 run_test(){

@@ -1,8 +1,16 @@
 #!/usr/bin/bash -eu
 
-BUILD_BIN=${BUILD_BIN:-"build/bin"}
+failwith(){
+    echo -ne "\e[1;31m[ERROR]\e[0m "
+    echo "$1"
+    exit 1
+}
+
+[ $# -eq 1 ] || failwith "Specify output directory"
+OUTDIR=$1
+
+BUILD_BIN=${BUILD_BIN:-"../../homfa/build/bin"}
 BENCHMARK=$BUILD_BIN/benchmark
-OUTDIR="log/$(date +'%Y%m%d%H%M%S')"
 NUM_AP=1
 OUT_FREQ=150
 FLUT_QUEUE_SIZE=15
@@ -10,12 +18,6 @@ FLUT_MAX_SECOND_LUT_DEPTH=8
 REVERSED_BOOTSTRAPPING_FREQ=30000
 OFFLINE_BOOTSTRAPPING_FREQ=30000
 RUN_ONLY_PLAIN=${RUN_ONLY_PLAIN:-"0"}
-
-failwith(){
-    echo -ne "\e[1;31m[ERROR]\e[0m "
-    echo "$1"
-    exit 1
-}
 
 run_homfa(){
     case "$1" in
