@@ -29,8 +29,10 @@ cd "$1"
 
 for dst_log in "${!logs[@]}"; do
     src_log="${logs[$dst_log]}"
-    echo "diff $src_log $dst_log"
-    diff <(grep "^result" $src_log) <(grep "^result" $dst_log)
+    if [ -f $dst_log -a -f $src_log ]; then
+        echo "diff $src_log $dst_log"
+        diff <(grep "^result" $src_log) <(grep "^result" $dst_log)
+    fi
 done
 
 echo
