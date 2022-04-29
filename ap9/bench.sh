@@ -79,7 +79,7 @@ run_test(){
     local reversed_enabled=$6
 
     run_benchmark plain $ap_size $spec_filepath $input_filepath $output_freq
-    run_benchmark offline $ap_size $spec_filepath $input_filepath 0
+    # run_benchmark offline $ap_size $spec_filepath $input_filepath 0
     if [ $reversed_enabled -eq 1 ]; then
         run_benchmark reversed $ap_size $spec_rev_filepath $input_filepath $output_freq
     fi

@@ -95,7 +95,7 @@ num_inputs=(10000 20000 30000 40000 50000)
 for num_state in "${fixed_num_states[@]}"; do
     for num_input in "${num_inputs[@]}"; do
         run_benchmark plain    "size-${num_state}" "size-${num_input}bit"
-        run_benchmark offline  "size-${num_state}" "size-${num_input}bit"
+        # run_benchmark offline  "size-${num_state}" "size-${num_input}bit"
         run_benchmark reversed "size-${num_state}" "size-${num_input}bit"
         run_benchmark bbs-150  "size-${num_state}" "size-${num_input}bit"
     done
@@ -104,7 +104,7 @@ done
 for num_state in "${num_states[@]}"; do
     for num_input in "${fixed_num_inputs[@]}"; do
         run_benchmark plain    "size-${num_state}" "size-${num_input}bit"
-        run_benchmark offline  "size-${num_state}" "size-${num_input}bit"
+        # run_benchmark offline  "size-${num_state}" "size-${num_input}bit"
         run_benchmark reversed "size-${num_state}" "size-${num_input}bit"
         run_benchmark bbs-150  "size-${num_state}" "size-${num_input}bit"
     done
