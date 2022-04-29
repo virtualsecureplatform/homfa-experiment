@@ -118,6 +118,7 @@ def import_result(table_name, result_dir)
 
   logfile_names.each do |logfile_name|
     Dir.glob(File.join(result_dir, "**", logfile_name)).each do |filename|
+      puts "Processing #{filename}"
       data = {
         enc: [],
         run: [],
