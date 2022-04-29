@@ -4,8 +4,8 @@ require "sqlite3"
 require "numo/gnuplot"
 require "stringio"
 
-#$export_type = :pdf
-$export_type = :tex
+$export_type = :pdf
+#$export_type = :tex
 
 module Enumerable
   def sum
