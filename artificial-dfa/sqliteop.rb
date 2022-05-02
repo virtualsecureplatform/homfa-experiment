@@ -4,6 +4,7 @@ require "sqlite3"
 require "numo/gnuplot"
 require "stringio"
 require "pathname"
+require "terminal-table"
 
 $export_type = :pdf
 #$export_type = :tex
@@ -397,7 +398,8 @@ end
 def print_usage_and_exit
   $stderr.puts "Usage: #{$0} import  TABLE-NAME RESULT-DIR"
   $stderr.puts "Usage: #{$0} plot    TABLE-NAME OUTPUT-DIR"
-  $stderr.puts "Usage: #{$0} tabular TABLE-NAME "
+  $stderr.puts "Usage: #{$0} table   TABLE-NAME"
+  $stderr.puts "Usage: #{$0} tabular TABLE-NAME"
   exit 1
 end
 
@@ -610,6 +612,62 @@ def print_gnuplot(table_name, output_dir)
   end
 end
 
+def print_table(table_name)
+  fixed_state_size = 500
+  fixed_input_size = 50000
+  algorithm_keys = ["reversed", "bbs-150"]
+  titles = ["Reverse", "Block"]
+  data_src = {
+    state_fixed: get_fixed_state_data_from_db(table_name, fixed_state_size),
+    input_fixed: get_fixed_input_data_from_db(table_name, fixed_input_size),
+  }
+  first_column_name_src = {
+    state_fixed: "# of Monitored Ciphertexts",
+    input_fixed: "# of States",
+  }
+  first_column_value_key_src = {
+    state_fixed: :input_size,
+    input_fixed: :state_size,
+  }
+  table_title_src = {
+    state_fixed: "Table 7: Experimental resutls of M_m when the number of the states (i.e., m) is fixed to 500.",
+    input_fixed: "Table 8: Experimental results of M_m when the number of monitored ciphertexts (i.e., n) is fixed to 50000.",
+  }
+
+  [:state_fixed, :input_fixed].each do |kind|
+    data = data_src[kind]
+    first_column_name = first_column_name_src[kind]
+    first_column_value_key = first_column_value_key_src[kind]
+    table_title = table_title_src[kind]
+
+    table = Terminal::Table.new do |t|
+      t.title = table_title
+      t.headings = ["Algorithm", first_column_name, "Runtime (CMux) (s)", "Runtime (Bootstrapping) (s)", "Runtime (CircuitBootstrapping) (s)", "Runtime (Total) (s)", "Memory Usage (GiB)"]
+      algorithm_keys.each_with_index do |algorithm_key, ki|
+        algorithm = titles[ki]
+        data[algorithm_key].each_with_index do |f, index|
+          first_column_value = case kind
+            when :state_fixed
+              "#{f[:input_size]}000"
+            when :input_fixed
+              "#{f[:state_size]}"
+            end
+          t << [
+            algorithm,
+            first_column_value,
+            "#{format_float(f[:cmux_sum_mean])}",
+            "#{format_float(f[:bs_sum_mean])}",
+            "#{format_float(f[:cb_sum_mean])}",
+            "#{format_float(f[:run_mean])}",
+            "#{format_float(f[:mem_mean])}",
+          ]
+        end
+      end
+    end
+    puts table
+  end
+end
+
 print_usage_and_exit unless ARGV.size >= 1
 
 case ARGV[0]
@@ -621,6 +679,9 @@ when "plot"
   print_gnuplot(ARGV[1], ARGV[2])
 when "tabular"
   print_tabular(ARGV[1])
+when "table"
+  print_usage_and_exit unless ARGV.size == 2
+  print_table(ARGV[1])
 else
   print_usage_and_exit
 end
