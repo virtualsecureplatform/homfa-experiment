@@ -429,10 +429,17 @@ def print_table(table_name)
   db = open_db
   db.execute("SELECT algorithm,spec,input,run_mean,run_stddev FROM #{table_name}").each do |fields|
     algorithm, spec, input, run_mean, run_stddev = fields
-    run_mean_s = run_mean.to_f / 1000000
-    run_mean_ms = run_mean.to_f / 1000
-    run_stddev_s = run_stddev.to_f / 1000000
-    run_stddev_ms = run_stddev.to_f / 1000
+    input_size = case input
+      when "adult-001-7days-bg.in"
+        10081
+      when "adult-001-night-bg.in"
+        721
+      end
+    run_mean_s = format_float2(run_mean&./ 1000000.0)
+    run_mean_ms = format_float2(run_mean&./ 1000.0)
+    run_stddev_s = format_float2(run_stddev&./ 1000000.0)
+    run_stddev_ms = format_float2(run_stddev&./ 1000.0)
+    run_mean_ms_per_input_size = format_float2(run_mean&./(1000.0 * input_size))
 
     alg = algorithm[0..2]
     fml = case spec
@@ -446,18 +453,12 @@ def print_table(table_name)
     run_key = "#{alg}_#{fml}_r"
     run_per_input_key = "#{alg}_#{fml}_rpi"
 
-    input_size = case input
-      when "adult-001-7days-bg.in"
-        10081
-      when "adult-001-night-bg.in"
-        721
-      end
     ## With stderr
     #data[run_key] = sprintf("%.2f\\pm%.2f", run_mean_s, run_stddev_s)
     #data[run_per_input_key] = sprintf("%.2f\\pm%.2f", run_mean_ms / input_size, run_stddev_ms / input_size)
     # Without stderr
-    data[run_key] = sprintf("%.2f", run_mean_s)
-    data[run_per_input_key] = sprintf("%.2f", run_mean_ms / input_size)
+    data[run_key] = run_mean_s
+    data[run_per_input_key] = run_mean_ms_per_input_size
   end
   #data["rev_psi1_r"] |= "\\text{---}"
   #data["rev_psi2_r"] |= "\\text{---}"
