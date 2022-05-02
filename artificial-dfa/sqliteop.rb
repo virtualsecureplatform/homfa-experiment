@@ -3,6 +3,7 @@
 require "sqlite3"
 require "numo/gnuplot"
 require "stringio"
+require "pathname"
 
 $export_type = :pdf
 #$export_type = :tex
@@ -395,7 +396,7 @@ end
 
 def print_usage_and_exit
   $stderr.puts "Usage: #{$0} import  TABLE-NAME RESULT-DIR"
-  $stderr.puts "Usage: #{$0} plot    TABLE-NAME "
+  $stderr.puts "Usage: #{$0} plot    TABLE-NAME OUTPUT-DIR"
   $stderr.puts "Usage: #{$0} tabular TABLE-NAME "
   exit 1
 end
@@ -520,10 +521,13 @@ EOS
   end
 end
 
-def print_gnuplot(table_name)
+def print_gnuplot(table_name, output_dir)
   fixed_state_size = 500
   fixed_input_size = 50000
   term_tikz_size = "6,3.1"
+
+  output_dir_path = Pathname(output_dir)
+  output_dir_path.mkpath
 
   keys = ["reversed", "bbs-150"]
   titles = ["ReverseStream", "BlockStream"]
@@ -556,7 +560,7 @@ def print_gnuplot(table_name)
   [:state_fixed, :input_fixed].each do |kind|
     data = data_src[kind]
     size_key = size_key_src[kind]
-    output_filename = output_filename_src[kind]
+    output_filename = (output_dir_path / output_filename_src[kind]).to_s
     xlabel, ylabel = xylabel_src[kind]
     xrange, yrange = xyrange_src[kind]
 
@@ -613,8 +617,8 @@ when "import"
   print_usage_and_exit unless ARGV.size == 3
   import_result ARGV[1], ARGV[2]
 when "plot"
-  print_usage_and_exit unless ARGV.size == 2
-  print_gnuplot(ARGV[1])
+  print_usage_and_exit unless ARGV.size == 3
+  print_gnuplot(ARGV[1], ARGV[2])
 when "tabular"
   print_tabular(ARGV[1])
 else
