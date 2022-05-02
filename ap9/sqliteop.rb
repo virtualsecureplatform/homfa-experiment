@@ -1,7 +1,6 @@
 #!/usr/bin/ruby
 
 require "sqlite3"
-require "byebug"
 require "ostruct"
 require "terminal-table"
 
