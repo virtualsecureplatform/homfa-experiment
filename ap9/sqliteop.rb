@@ -3,6 +3,7 @@
 require "sqlite3"
 require "byebug"
 require "ostruct"
+require "terminal-table"
 
 module Enumerable
   def sum
@@ -416,8 +417,78 @@ EOS
 
 end
 
+def print_table(table_name)
+  data = {}
+  db = open_db
+  db.execute("SELECT algorithm,spec,input,run_mean,run_stddev FROM #{table_name}").each do |fields|
+    algorithm, spec, input, run_mean, run_stddev = fields
+    run_mean_s = run_mean.to_f / 1000000
+    run_mean_ms = run_mean.to_f / 1000
+    run_stddev_s = run_stddev.to_f / 1000000
+    run_stddev_ms = run_stddev.to_f / 1000
+
+    alg = algorithm[0..2]
+    fml = case spec
+      when /^towards-00([124])(-rev)?\.spec$/
+        "psi#{$1}"
+      when /^damon-00([145])(-rev)?\.spec$/
+        "phi#{$1}"
+      else
+        raise "Unknown spec"
+      end
+    run_key = "#{alg}_#{fml}_r"
+    run_per_input_key = "#{alg}_#{fml}_rpi"
+
+    input_size = case input
+      when "adult-001-7days-bg.in"
+        10081
+      when "adult-001-night-bg.in"
+        721
+      end
+    ## With stderr
+    #data[run_key] = sprintf("%.2f\\pm%.2f", run_mean_s, run_stddev_s)
+    #data[run_per_input_key] = sprintf("%.2f\\pm%.2f", run_mean_ms / input_size, run_stddev_ms / input_size)
+    # Without stderr
+    data[run_key] = sprintf("%.2f", run_mean_s)
+    data[run_per_input_key] = sprintf("%.2f", run_mean_ms / input_size)
+  end
+  #data["rev_psi1_r"] |= "\\text{---}"
+  #data["rev_psi2_r"] |= "\\text{---}"
+  #data["rev_psi4_r"] |= "\\text{---}"
+  #data["rev_psi1_rpi"] |= "\\text{---}"
+  #data["rev_psi2_rpi"] |= "\\text{---}"
+  #data["rev_psi4_rpi"] |= "\\text{---}"
+
+  d = OpenStruct.new(data)
+
+  table = Terminal::Table.new do |t|
+    t.title = "Table 5: Experimental results of blood glucose monitoring, where Q is the state space of the monitoring DFA and Q^R is the state space of the reversed DFA."
+    t.headings = ["Formula", "|Q|", "|Q^R|", "# of blood glucose values", "Algorithm", "Runtime (s)", "Mean Runtime (ms/value)"]
+    t << ["psi_1", "10524", "2712974", "721", "Reverse", d.rev_psi1_r, d.rev_psi1_rpi]
+    t << ["psi_1", "10524", "2712974", "721", "Block", d.bbs_psi1_r, d.bbs_psi1_rpi]
+    t << ["psi_2", "11126", "2885376", "721", "Reverse", d.rev_psi2_r, d.rev_psi2_rpi]
+    t << ["psi_2", "11126", "2885376", "721", "Block", d.bbs_psi2_r, d.bbs_psi2_rpi]
+    t << ["psi_4", "7026", "---", "721", "Reverse", "---", "---"]
+    t << ["psi_4", "7026", "---", "721", "Block", d.bbs_psi4_r, d.bbs_psi4_rpi]
+    t.add_separator
+    t << ["phi_1", "21", "20", "10081", "Reverse", d.rev_phi1_r, d.rev_phi1_rpi]
+    t << ["phi_1", "21", "20", "10081", "Block", d.bbs_phi1_r, d.bbs_phi1_rpi]
+    t << ["phi_4", "237", "237", "10081", "Reverse", d.rev_phi4_r, d.rev_phi4_rpi]
+    t << ["phi_4", "237", "237", "10081", "Block", d.bbs_phi4_r, d.bbs_phi4_rpi]
+    t << ["phi_5", "390", "390", "10081", "Reverse", d.rev_phi5_r, d.rev_phi5_rpi]
+    t << ["phi_5", "390", "390", "10081", "Block", d.bbs_phi5_r, d.bbs_phi5_rpi]
+  end
+  table.align_column(1, :right)
+  table.align_column(2, :right)
+  table.align_column(3, :right)
+  table.align_column(5, :right)
+  table.align_column(6, :right)
+  puts table
+end
+
 def print_usage_and_exit
   $stderr.puts "Usage: #{$0} import           TABLE-NAME RESULT-DIR"
+  $stderr.puts "Usage: #{$0} table            TABLE-NAME"
   $stderr.puts "Usage: #{$0} tabular          TABLE-NAME"
   $stderr.puts "Usage: #{$0} detailed-tabular TABLE-NAME"
   exit 1
@@ -435,6 +506,9 @@ when "tabular"
 when "detailed-tabular"
   print_usage_and_exit unless ARGV.size == 2
   export_latex_detailed_tabular ARGV[1]
+when "table"
+  print_usage_and_exit unless ARGV.size == 2
+  print_table ARGV[1]
 else
   print_usage_and_exit
 end
