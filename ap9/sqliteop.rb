@@ -46,6 +46,14 @@ def format_float(val)
   end
 end
 
+def format_float2(val)
+  if val.nil?
+    "---"
+  else
+    sprintf("%.2f", val)
+  end
+end
+
 def import_result(table_name, result_dir)
   logfile_names = [
     # output interval = 9
@@ -486,9 +494,88 @@ def print_table(table_name)
   puts table
 end
 
+def print_detailed_table(table_name)
+  sql = <<"SQL"
+SELECT
+  algorithm,
+  spec,
+  input,
+  enc_mean,
+  run_mean,
+  dec_mean,
+  cb_sum_mean,
+  cmux_sum_mean,
+  bs_sum_mean,
+  mem_mean
+FROM
+  #{table_name}
+SQL
+
+  data = {}
+  db = open_db
+  db.execute(sql).each do |algorithm, spec, input, enc_mean, run_mean, dec_mean, cb_sum_mean, cmux_sum_mean, bs_sum_mean, mem_mean|
+    alg = algorithm[0..2]
+    fml = case spec
+      when /^towards-00([124])(-rev)?\.spec$/
+        "psi#{$1}"
+      when /^damon-00([145])(-rev)?\.spec$/
+        "phi#{$1}"
+      else
+        raise "Unknown spec"
+      end
+
+    input_size = case input
+      when "adult-001-7days-bg.in"
+        10081
+      when "adult-001-night-bg.in"
+        721
+      end
+    runtime = format_float2(run_mean&./(1000000.0))
+    average_runtime = format_float2(run_mean&./(input_size * 1000.0))
+    memory_usage = format_float2(mem_mean&./(1024.0 * 1024.0))
+    cmux_runtime = format_float2(cmux_sum_mean&./(1000000.0))
+    bs_runtime = format_float2(bs_sum_mean&./(1000000.0))
+    cb_runtime = format_float2(cb_sum_mean&./(1000000.0))
+
+    key = "#{alg}_#{fml}"
+    data[key] = [cmux_runtime, bs_runtime, cb_runtime, runtime, average_runtime, memory_usage]
+  end
+
+  d = OpenStruct.new(data)
+
+  table = Terminal::Table.new do |t|
+    t.title = "Table 9: Experimental results of blood glucose monitoring, where Q is the state space of the monitoring DFA and Q^R is the state space of the reversed DFA."
+    t.headings = ["Formula", "|Q|", "|Q^R|", "# of values", "Algorithm", "Runtime(CMux)(s)", "Runtime(B.)(s)", "Runtime(C.B.)(s)", "Runtime(Total)(s)", "Mean Runtime(ms/value)", "Mem(GiB)"]
+    t << (["psi_1", "10524", "2712974", "721", "Reverse"] + d.rev_psi1)
+    t << (["psi_1", "10524", "2712974", "721", "Block"] + d.bbs_psi1)
+    t << (["psi_2", "11126", "2885376", "721", "Reverse"] + d.rev_psi2)
+    t << (["psi_2", "11126", "2885376", "721", "Block"] + d.bbs_psi2)
+    t << ["psi_4", "7026", "---", "721", "Reverse", "---", "---", "---", "---", "---", "---"]
+    t << (["psi_4", "7026", "---", "721", "Block"] + d.bbs_psi4)
+    t.add_separator
+    t << (["phi_1", "21", "20", "10081", "Reverse"] + d.rev_phi1)
+    t << (["phi_1", "21", "20", "10081", "Block"] + d.bbs_phi1)
+    t << (["phi_4", "237", "237", "10081", "Reverse"] + d.rev_phi4)
+    t << (["phi_4", "237", "237", "10081", "Block"] + d.bbs_phi4)
+    t << (["phi_5", "390", "390", "10081", "Reverse"] + d.rev_phi5)
+    t << (["phi_5", "390", "390", "10081", "Block"] + d.bbs_phi5)
+  end
+  table.align_column(1, :right)
+  table.align_column(2, :right)
+  table.align_column(3, :right)
+  table.align_column(5, :right)
+  table.align_column(6, :right)
+  table.align_column(7, :right)
+  table.align_column(8, :right)
+  table.align_column(9, :right)
+  table.align_column(10, :right)
+  puts table
+end
+
 def print_usage_and_exit
   $stderr.puts "Usage: #{$0} import           TABLE-NAME RESULT-DIR"
   $stderr.puts "Usage: #{$0} table            TABLE-NAME"
+  $stderr.puts "Usage: #{$0} detailed-table   TABLE-NAME"
   $stderr.puts "Usage: #{$0} tabular          TABLE-NAME"
   $stderr.puts "Usage: #{$0} detailed-tabular TABLE-NAME"
   exit 1
@@ -509,6 +596,9 @@ when "detailed-tabular"
 when "table"
   print_usage_and_exit unless ARGV.size == 2
   print_table ARGV[1]
+when "detailed-table"
+  print_usage_and_exit unless ARGV.size == 2
+  print_detailed_table ARGV[1]
 else
   print_usage_and_exit
 end
