@@ -49,4 +49,4 @@ for dst_log in "${!logs[@]}"; do
     fi
 done
 
-echo
+echo "Correct."
