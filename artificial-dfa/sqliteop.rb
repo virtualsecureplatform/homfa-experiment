@@ -532,7 +532,7 @@ def print_gnuplot(table_name, output_dir)
   output_dir_path.mkpath
 
   keys = ["reversed", "bbs-150"]
-  titles = ["ReverseStream", "BlockStream"]
+  titles = ["Reverse", "Block"]
   #keys = ["offline", "reversed", "bbs-150"]
   #titles = ["Offline", "ReverseStream", "BlockStream"]
   #titles = ["\\Cref{alg:offline}", "\\Cref{alg:reversed}", "\\Cref{alg:bbs}"]
@@ -551,20 +551,20 @@ def print_gnuplot(table_name, output_dir)
     input_fixed: "#{table_name}-fixed-input",
   }
   xylabel_src = {
-    state_fixed: ["\\# of Monitored Ciphertexts ($\\times 10^3$)", "time (sec)"],
-    input_fixed: ["\\# of States (states)", "time (sec)"],
+    state_fixed: ["# of Monitored Ciphertexts (times 10^3)", "time (sec)"],
+    input_fixed: ["# of States (states)", "time (sec)"],
   }
-  xyrange_src = {
-    state_fixed: ["[5:56]", "[0:200]"],
-    input_fixed: ["[0:510]", "[0:200]"],
-  }
+  #xyrange_src = {
+  #  state_fixed: ["[5:56]", "[0:200]"],
+  #  input_fixed: ["[0:510]", "[0:200]"],
+  #}
 
   [:state_fixed, :input_fixed].each do |kind|
     data = data_src[kind]
     size_key = size_key_src[kind]
     output_filename = (output_dir_path / output_filename_src[kind]).to_s
     xlabel, ylabel = xylabel_src[kind]
-    xrange, yrange = xyrange_src[kind]
+    #xrange, yrange = xyrange_src[kind]
 
     points = []
     keys.each_with_index do |key, index|
@@ -604,8 +604,8 @@ def print_gnuplot(table_name, output_dir)
       set :key, :Left
       set :xlabel, xlabel
       set :ylabel, ylabel
-      set :xrange, xrange
-      set :yrange, yrange
+      #set :xrange, xrange
+      #set :yrange, yrange
       set :key, :spacing, 0.9
       plot *points
     end
