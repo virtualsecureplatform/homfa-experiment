@@ -664,6 +664,11 @@ def print_table(table_name)
         end
       end
     end
+    table.align_column(2, :right)
+    table.align_column(3, :right)
+    table.align_column(4, :right)
+    table.align_column(5, :right)
+    table.align_column(6, :right)
     puts table
   end
 end
