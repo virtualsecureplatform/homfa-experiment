@@ -38,7 +38,7 @@ cat $logfilename | awk -F',' '
     /^time_recorder-bootstrapping/ { bs += $3 }
     END {
         printf "Runtime (total): %.2f (s)\n", (run/1000/1000);
-        printf "    CMux:                 %.2f (s)\n", (cmux/1000/1000);
-        printf "    Bootstrapping:        %.2f (s)\n", (bs/1000/1000);
-        printf "    CircuitBootstrapping: %.2f (s)\n", (cb/1000/1000);
+        printf "    CMux:                 %.3f (s)\n", (cmux/1000/1000);
+        printf "    Bootstrapping:        %.3f (s)\n", (bs/1000/1000);
+        printf "    CircuitBootstrapping: %.3f (s)\n", (cb/1000/1000);
     }'
