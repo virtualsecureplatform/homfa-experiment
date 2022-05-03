@@ -9,7 +9,7 @@ failwith(){
 [ $# -eq 1 ] || failwith "Specify output directory"
 OUTDIR=$1
 
-BUILD_BIN=${BUILD_BIN:-"../../homfa/build/bin"}
+BUILD_BIN=${BUILD_BIN:-"../../homfa/bin"}
 BENCHMARK=$BUILD_BIN/benchmark
 NUM_AP=1
 OUT_FREQ=150
