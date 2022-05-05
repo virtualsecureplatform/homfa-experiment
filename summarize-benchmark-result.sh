@@ -18,7 +18,7 @@ trap on_err ERR
 print_error(){
   # Thanks to: https://stackoverflow.com/a/23550347
   echo
-  echo -ne "\e[1;31m[ERROR]\e[0m " >&2
+  echo -e "\e[1;31m[ERROR]\e[0m $@" >&2
   echo
 }
 
