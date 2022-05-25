@@ -594,8 +594,6 @@ def print_gnuplot(table_name)
         set :output, "#{output_filename}.pdf"
       end
       set :monochrom
-      set :key, :left, :top
-      set :key, :Left
       set :xlabel, xlabel
       set :ylabel, ylabel
       set :xrange, xrange
