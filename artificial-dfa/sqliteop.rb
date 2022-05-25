@@ -526,7 +526,7 @@ def print_gnuplot(table_name)
   term_tikz_size = "6,3"
 
   keys = ["reversed", "bbs-150"]
-  titles = ["ReverseStream", "BlockStream"]
+  titles = ["\\ReverseStream", "\\BlockStream"]
   #keys = ["offline", "reversed", "bbs-150"]
   #titles = ["Offline", "ReverseStream", "BlockStream"]
   #titles = ["\\Cref{alg:offline}", "\\Cref{alg:reversed}", "\\Cref{alg:bbs}"]
