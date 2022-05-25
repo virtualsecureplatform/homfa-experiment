@@ -523,7 +523,7 @@ end
 def print_gnuplot(table_name)
   fixed_state_size = 500
   fixed_input_size = 50000
-  term_tikz_size = "6,3.1"
+  term_tikz_size = "6,3"
 
   keys = ["reversed", "bbs-150"]
   titles = ["ReverseStream", "BlockStream"]
