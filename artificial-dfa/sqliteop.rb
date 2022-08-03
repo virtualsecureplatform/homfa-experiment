@@ -1,11 +1,14 @@
 #!/usr/bin/ruby
 
+# for plot: gnuplot -e 'set term lua tikz createstyle'
+
 require "sqlite3"
 require "numo/gnuplot"
 require "stringio"
+require "csv"
 
-$export_type = :pdf
-#$export_type = :tex
+#$export_type = :pdf
+$export_type = :tex
 
 module Enumerable
   def sum
@@ -520,6 +523,121 @@ EOS
   end
 end
 
+def print_csv(table_name)
+  fixed_state_size = 500
+  fixed_input_size = 50000
+  keys = ["reversed", "bbs-150"]
+  data_src = {
+    state_fixed: get_fixed_state_data_from_db(table_name, fixed_state_size),
+    input_fixed: get_fixed_input_data_from_db(table_name, fixed_input_size),
+  }
+  size_key_src = {
+    state_fixed: :input_size,
+    input_fixed: :state_size,
+  }
+  output_filename_src = {
+    state_fixed: "#{table_name}-fixed-state",
+    input_fixed: "#{table_name}-fixed-input",
+  }
+
+  [:state_fixed, :input_fixed].each do |kind|
+    data = data_src[kind]
+    size_key = size_key_src[kind]
+    output_filename = output_filename_src[kind]
+
+    keys.each_with_index do |key, index|
+      values = data[key].map do |f|
+        [f[size_key], f[:run_mean], f[:run_stddev]]
+      end
+      CSV.open("#{output_filename}-#{key}.csv", "wb") do |csv|
+        values.each do |row|
+          csv << row
+        end
+      end
+    end
+  end
+end
+
+def print_gnuplot2(table_names)
+  fixed_state_size = 500
+  fixed_input_size = 50000
+  term_tikz_size = "10,10"
+
+  keys = ["reversed", "bbs-150"]
+  titles = ["WS \\ReverseStream", "WS \\BlockStream", "Laptop \\ReverseStream", "Laptop \\BlockStream"]
+  #keys = ["offline", "reversed", "bbs-150"]
+  #titles = ["Offline", "ReverseStream", "BlockStream"]
+  #titles = ["\\Cref{alg:offline}", "\\Cref{alg:reversed}", "\\Cref{alg:bbs}"]
+  line_style = [1, 1, 2, 2]
+  point_style = [1, 4, 1, 4]
+  size_key_src = {
+    state_fixed: :input_size,
+    input_fixed: :state_size,
+  }
+  output_filename_src = {
+    state_fixed: "#{table_names.join("-")}-fixed-state",
+    input_fixed: "#{table_names.join("-")}-fixed-input",
+  }
+  xylabel_src = {
+    state_fixed: ["\\# of Monitored Ciphertexts ($\\times 10^3$)", "time (sec)"],
+    input_fixed: ["\\# of States (states)", "time (sec)"],
+  }
+  xyrange_src = {
+    state_fixed: ["[5:56]", "[0:250]"],
+    input_fixed: ["[0:510]", "[0:250]"],
+  }
+
+  [:state_fixed, :input_fixed].each do |kind|
+    size_key = size_key_src[kind]
+    output_filename = output_filename_src[kind]
+    xlabel, ylabel = xylabel_src[kind]
+    xrange, yrange = xyrange_src[kind]
+    points = []
+
+    table_names.each_with_index do |table_name, table_index|
+      data = case kind
+        when :state_fixed
+          get_fixed_state_data_from_db(table_name, fixed_state_size)
+        when :input_fixed
+          get_fixed_input_data_from_db(table_name, fixed_input_size)
+        end
+      keys.each_with_index do |key, key_index|
+        values = data[key].map do |f|
+          [f[size_key], f[:run_mean], f[:run_stddev]]
+        end
+        index = table_index * keys.size + key_index
+        points.push([
+          *values.transpose,
+          with: :linespoints,
+          title: titles[index],
+          lt: line_style[index],
+          lw: 2,
+          pt: point_style[index],
+          ps: 1,
+        ])
+      end
+    end
+
+    Numo.gnuplot do
+      case $export_type
+      when :tex
+        set :term, :lua, :tikz
+        set :output, "#{output_filename}.tex"
+        set :term, :tikz, :size, term_tikz_size
+      when :pdf
+        set :terminal, :pdf, :font, "Helvetica,20"
+        set :output, "#{output_filename}.pdf"
+      end
+      set :monochrom
+      set :xlabel, xlabel
+      set :ylabel, ylabel
+      set :xrange, xrange
+      set :yrange, yrange
+      plot *points
+    end
+  end
+end
+
 def print_gnuplot(table_name)
   fixed_state_size = 500
   fixed_input_size = 50000
@@ -613,6 +731,12 @@ when "import"
 when "plot"
   print_usage_and_exit unless ARGV.size == 2
   print_gnuplot(ARGV[1])
+when "plot2"
+  print_usage_and_exit unless ARGV.size >= 3
+  print_gnuplot2(ARGV[1..])
+when "csv"
+  print_usage_and_exit unless ARGV.size == 2
+  print_csv(ARGV[1])
 when "tabular"
   print_tabular(ARGV[1])
 else
