@@ -1,3 +1,4 @@
 _test_*
 *.log
 master-thesis/ap6/out
+*.sqlite3
