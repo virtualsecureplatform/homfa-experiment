@@ -706,7 +706,8 @@ def print_gnuplot(table_name)
       when :tex
         set :term, :lua, :tikz
         set :output, "#{output_filename}.tex"
-        set :term, :tikz, :size, term_tikz_size
+        set :term, :tikz, :size, term_tikz_size, :font, ",8"
+        set :ylabel, :offset, "-1, 0"
       when :pdf
         set :terminal, :pdf, :font, "Helvetica,20"
         set :output, "#{output_filename}.pdf"
@@ -716,7 +717,7 @@ def print_gnuplot(table_name)
       set :ylabel, ylabel
       set :xrange, xrange
       set :yrange, yrange
-      set :key, :spacing, 0.9
+      #set :key, :spacing, 0.9
       plot *points
     end
   end
