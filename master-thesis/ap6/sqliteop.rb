@@ -447,19 +447,19 @@ def print_table(table_name)
   table = Terminal::Table.new do |t|
     t.title = "Table 5: Experimental results of blood glucose monitoring, where Q is the state space of the monitoring DFA and Q^R is the state space of the reversed DFA."
     t.headings = ["Formula", "|Q|", "|Q^R|", "# of blood glucose values", "Algorithm", "Runtime (s)", "Mean Runtime (ms/value)"]
-    t << ["psi_1", "10524", "2712974", "721", "Reverse", d.rev_psi1_r, d.rev_psi1_rpi]
-    t << ["psi_1", "10524", "2712974", "721", "Block", d.bbs_psi1_r, d.bbs_psi1_rpi]
-    t << ["psi_2", "11126", "2885376", "721", "Reverse", d.rev_psi2_r, d.rev_psi2_rpi]
-    t << ["psi_2", "11126", "2885376", "721", "Block", d.bbs_psi2_r, d.bbs_psi2_rpi]
-    t << ["psi_4", "7026", "---", "721", "Reverse", "---", "---"]
-    t << ["psi_4", "7026", "---", "721", "Block", d.bbs_psi4_r, d.bbs_psi4_rpi]
+    t << ["psi_1", "7215", "1856014", "721", "Reverse", d.rev_psi1_r, d.rev_psi1_rpi]
+    t << ["psi_1", "7215", "1856014", "721", "Block", d.bbs_psi1_r, d.bbs_psi1_rpi]
+    t << ["psi_2", "6015", "1531414", "721", "Reverse", d.rev_psi2_r, d.rev_psi2_rpi]
+    t << ["psi_2", "6015", "1531414", "721", "Block", d.bbs_psi2_r, d.bbs_psi2_rpi]
+    t << ["psi_4", "4617", "---", "721", "Reverse", "---", "---"]
+    t << ["psi_4", "4617", "---", "721", "Block", d.bbs_psi4_r, d.bbs_psi4_rpi]
     t.add_separator
-    t << ["phi_1", "21", "20", "10081", "Reverse", d.rev_phi1_r, d.rev_phi1_rpi]
-    t << ["phi_1", "21", "20", "10081", "Block", d.bbs_phi1_r, d.bbs_phi1_rpi]
-    t << ["phi_4", "237", "237", "10081", "Reverse", d.rev_phi4_r, d.rev_phi4_rpi]
-    t << ["phi_4", "237", "237", "10081", "Block", d.bbs_phi4_r, d.bbs_phi4_rpi]
-    t << ["phi_5", "390", "390", "10081", "Reverse", d.rev_phi5_r, d.rev_phi5_rpi]
-    t << ["phi_5", "390", "390", "10081", "Block", d.bbs_phi5_r, d.bbs_phi5_rpi]
+    t << ["phi_1", "13", "13", "10081", "Reverse", d.rev_phi1_r, d.rev_phi1_rpi]
+    t << ["phi_1", "13", "13", "10081", "Block", d.bbs_phi1_r, d.bbs_phi1_rpi]
+    t << ["phi_4", "186", "186", "10081", "Reverse", d.rev_phi4_r, d.rev_phi4_rpi]
+    t << ["phi_4", "186", "186", "10081", "Block", d.bbs_phi4_r, d.bbs_phi4_rpi]
+    t << ["phi_5", "234", "234", "10081", "Reverse", d.rev_phi5_r, d.rev_phi5_rpi]
+    t << ["phi_5", "234", "234", "10081", "Block", d.bbs_phi5_r, d.bbs_phi5_rpi]
   end
   table.align_column(1, :right)
   table.align_column(2, :right)
